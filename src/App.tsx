@@ -44,9 +44,9 @@ export default function App() {
         {activeTab === "resources" && <Resources />}
       </main>
 
-      <footer className="hidden md:block py-12 border-t border-border mt-20">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>© 2026 Nutq Nur. Guliston Davlat Pedagogika Instituti Magistrlik Dissertatsiyasi loyihasi.</p>
+      <footer className="py-12 border-t border-border mt-20">
+        <div className="container mx-auto px-4 text-center text-muted-foreground text-sm md:text-base">
+          <p>© 2026 Nutq Nur. Guliston Davlat Pedagogika Instituti Magistrlik Dissertatsiyasi loyihasi. Magistrant Xolmurodova Yorqinoy.</p>
         </div>
       </footer>
     </div>
