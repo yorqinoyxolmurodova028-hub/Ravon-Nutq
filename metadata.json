@@ -1,0 +1,12 @@
+{
+  "name": "Nutq Nur - Logopedik Platforma",
+  "description": "Boshlang'ich sinf o'quvchilarida uchraydigan nutq nuqsonlarini aniqlash va bartaraf etish uchun innovatsion platforma.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "AI-powered speech analysis",
+    "Interactive diagnostic tests",
+    "Corrective exercise library"
+  ]
+}
