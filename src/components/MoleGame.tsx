@@ -218,47 +218,50 @@ export function MoleGame() {
   }
 
   return (
-    <div className={`flex flex-col items-center gap-8 py-4 px-4 w-full transition-all duration-300 ${showFlash ? 'ring-8 ring-red-500 ring-inset rounded-3xl' : ''}`}>
-      <div className="w-full flex justify-between items-center px-4">
+    <div className={`flex flex-col items-center gap-6 py-4 px-4 w-full h-full justify-center transition-all duration-300 ${showFlash ? 'ring-8 ring-red-500 ring-inset rounded-[3rem]' : ''}`}>
+      <div className="w-full max-w-md flex justify-between items-center px-4 bg-white/80 backdrop-blur-md py-4 rounded-[2rem] shadow-sm sticker-shadow">
         <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 bg-muted px-4 py-1.5 rounded-full font-bold text-sm">
-            <Timer className="w-4 h-4 text-primary" />
-            Vaqt: {timeLeft}s
+            <div className="flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-xl font-black text-slate-700 text-sm">
+              <Timer className="w-4 h-4 text-primary" />
+              {timeLeft}s
             </div>
-            <div className="flex items-center gap-1 px-4">
-                {Array.from({ length: 3 }).map((_, i) => (
+            <div className="flex items-center gap-1 px-1">
+                {Array.from({ length: 5 }).map((_, i) => (
                     <Heart 
                         key={i} 
-                        className={`w-5 h-5 ${i < lives ? 'text-red-500 fill-red-500' : 'text-muted-foreground opacity-30'}`} 
+                        className={`w-5 h-5 transition-all duration-300 ${i < lives ? 'text-rose-500 fill-rose-500 scale-110' : 'text-slate-200 opacity-30 scale-90'}`} 
                     />
                 ))}
             </div>
         </div>
-        <div className="flex items-center gap-2 text-orange-500 font-bold text-2xl">
-          < Star className="fill-current w-6 h-6" />
-          {score}
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Ballar</span>
+          <div className="flex items-center gap-2 text-orange-500 font-black text-4xl font-display">
+            <Star className="fill-current w-8 h-8" />
+            {score}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 w-full max-w-xs md:max-w-md aspect-square mt-4">
+      <div className="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-[320px] md:max-w-md aspect-square mt-2">
         {Array.from({ length: GRID_SIZE }).map((_, i) => (
-            <div key={i} className="relative group [perspective:1000px]" onClick={() => handleHit(i)}>
+            <div key={i} className="relative group cursor-pointer active:scale-95 transition-transform" onClick={() => handleHit(i)}>
             {/* Mound/Hole Background */}
-            <div className={`absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-stone-200 to-stone-300 shadow-inner border-b-4 border-stone-400 transition-all duration-300
-              ${activeHole === i ? 'ring-4 ring-orange-400/30 bg-orange-50' : ''}`} 
+            <div className={`absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-stone-200 to-stone-400 shadow-inner border-b-8 border-stone-500/30 transition-all duration-300
+              ${activeHole === i ? 'ring-4 ring-orange-400/50 bg-orange-50' : ''}`} 
             />
             
             {/* Actual Hole Opening */}
-            <div className="absolute inset-2 rounded-[2rem] bg-stone-900/10 shadow-[inset_0_4px_12px_rgba(0,0,0,0.15)] overflow-hidden">
+            <div className="absolute inset-3 rounded-[2rem] bg-stone-900/20 shadow-[inset_0_6px_12px_rgba(0,0,0,0.3)] overflow-hidden">
                <AnimatePresence>
                  {activeHole === i && (
                    <motion.div
                      key={activeItem?.emoji}
-                     initial={{ y: 80, opacity: 0, scale: 0.5 }}
+                     initial={{ y: 60, opacity: 0, scale: 0.5 }}
                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                     exit={{ y: 80, opacity: 0, scale: 0.5 }}
-                     transition={{ type: "spring", damping: 15, stiffness: 200 }}
-                     className="absolute inset-0 flex items-center justify-center text-5xl md:text-6xl select-none filter drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
+                     exit={{ y: 60, opacity: 0, scale: 0.5 }}
+                     transition={{ type: "spring", damping: 12, stiffness: 200 }}
+                     className="absolute inset-0 flex items-center justify-center text-5xl md:text-7xl select-none filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]"
                    >
                      {activeItem?.emoji}
                    </motion.div>
@@ -267,14 +270,14 @@ export function MoleGame() {
             </div>
 
             {/* Dirt Front Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-stone-400/40 to-transparent pointer-events-none rounded-b-[2.5rem]" />
+            <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-stone-500/30 to-transparent pointer-events-none rounded-b-[2.5rem]" />
           </div>
         ))}
       </div>
 
-      <div className="w-full max-w-md p-4 bg-muted/30 rounded-2xl border border-border mt-4 text-center">
-        <p className="text-sm text-muted-foreground">
-          Borgan sari predmetlar tezroq chiqib-kiradi. Diqqatli bo'ling!
+      <div className="w-full max-w-sm p-4 bg-white/50 backdrop-blur-sm rounded-2xl border-2 border-white/50 text-center sticker-shadow">
+        <p className="text-sm text-slate-500 font-bold">
+          Tezroq bosing! Har bir to'g'ri hit +5 ball beradi! 🚀
         </p>
       </div>
     </div>

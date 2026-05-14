@@ -133,75 +133,80 @@ export function EducationalGames() {
   };
 
   return (
-    <section className="py-12 px-4 max-w-6xl mx-auto">
-      <div className="text-center mb-12">
+    <section className="py-12 px-4 max-w-6xl mx-auto pb-40">
+      <div className="text-center mb-16">
         <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="inline-block p-3 rounded-2xl bg-primary/10 text-primary mb-4"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="inline-block p-4 rounded-[2rem] bg-yellow-100 text-yellow-600 mb-6 shadow-inner sticker-shadow"
         >
-          <Gamepad2 className="w-10 h-10" />
+          <Gamepad2 className="w-12 h-12" />
         </motion.div>
-        <h2 className="text-4xl font-bold mb-4">Elektron O'yinlar</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-          Nutqni qiziqarli va o'yin orqali rivojlantirish uchun maxsus ishlab chiqilgan interaktiv o'yinlar to'plami.
+        <h2 className="text-5xl md:text-6xl font-black font-display text-slate-900 mb-4 bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
+          Elektron O'yinlar 🎮
+        </h2>
+        <p className="text-2xl text-slate-500 font-medium max-w-3xl mx-auto">
+          Bilim olish - bu eng katta sarguzasht! 🌟
+          Keling, birga o'ynaymiz va yangi narsalarni o'rganamiz.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {games.map((game, index) => (
           <motion.div
             key={game.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -10, scale: 1.02 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
+            transition={{ delay: index * 0.1, type: "spring" }}
           >
-            <Card className="group hover:shadow-2xl transition-all duration-500 border-none bg-card/50 backdrop-blur-sm overflow-hidden h-full flex flex-col relative">
-              <div className="aspect-video overflow-hidden relative">
+            <Card className="group hover:shadow-2xl transition-all duration-500 border-none bg-white rounded-[3rem] overflow-hidden h-full flex flex-col relative sticker-shadow">
+              <div className="aspect-[4/3] overflow-hidden relative">
                 <img 
                   src={game.image} 
                   alt={game.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-80`} />
-                <div className="absolute top-4 left-4">
-                   <div className={`p-2.5 rounded-xl ${game.color} text-white shadow-lg`}>
-                      <game.icon className="w-5 h-5" />
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-80`} />
+                <div className="absolute top-6 left-6">
+                   <div className={`p-3.5 rounded-2xl ${game.color} text-white shadow-xl rotate-[-5deg] group-hover:rotate-0 transition-transform`}>
+                      <game.icon className="w-6 h-6 border-b-2 border-white/20" />
                    </div>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end text-white">
-                   <div className="space-y-0.5">
-                      <Badge variant="secondary" className="bg-white/20 backdrop-blur-md border-none text-white text-[10px] uppercase tracking-wider">
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                   <div className="space-y-1">
+                      <Badge variant="secondary" className="bg-white/20 backdrop-blur-md border-none text-white text-[10px] font-black uppercase tracking-widest px-3 py-1">
                         {game.category}
                       </Badge>
-                      <h3 className="text-xl font-bold">{game.title}</h3>
+                      <h3 className="text-3xl font-black font-display drop-shadow-md">{game.title}</h3>
                    </div>
                 </div>
               </div>
 
-              <CardContent className="flex-1 p-6 flex flex-col gap-4">
-                <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
+              <CardContent className="flex-1 p-8 flex flex-col gap-6 pt-8">
+                <p className="text-lg text-slate-500 font-medium leading-relaxed line-clamp-3">
                   {game.description}
                 </p>
                 
-                <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/50">
+                <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-50">
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Qiyinchilik</span>
-                    <span className="text-sm font-semibold">{game.difficulty}</span>
+                    <span className="text-[11px] uppercase font-black text-slate-400 tracking-widest">Qiyinchilik</span>
+                    <span className={`text-sm font-black ${
+                      game.difficulty === "Oson" ? "text-emerald-500" : 
+                      game.difficulty === "O'rtacha" ? "text-orange-500" : "text-rose-500"
+                    }`}>{game.difficulty}</span>
                   </div>
                   <Button 
                     onClick={() => handlePlay(game)}
-                    className={`rounded-xl px-6 h-10 ${game.color} hover:brightness-110 transition-all shadow-lg shadow-primary/20`}
+                    className={`rounded-2xl px-10 h-14 text-xl font-black ${game.color} hover:brightness-110 transition-all shadow-xl shadow-slate-100 border-b-4 border-black/10 active:border-b-0 active:translate-y-1`}
                   >
-                    <Play className="w-4 h-4 mr-2 fill-current" />
-                    O'ynash
+                    <Play className="w-5 h-5 mr-3 fill-current" />
+                    O'yna!
                   </Button>
                 </div>
               </CardContent>
-
-              {/* Decorative hover element */}
-              <div className={`absolute top-0 right-0 w-24 h-24 ${game.color} opacity-0 group-hover:opacity-5 blur-[40px] transition-opacity duration-500`} />
             </Card>
           </motion.div>
         ))}
@@ -211,19 +216,20 @@ export function EducationalGames() {
         setIsDialogOpen(open);
         if (!open) setIsPlaying(false);
       }}>
-        <DialogContent className={`${isPlaying ? 'max-w-[98vw] md:max-w-5xl w-full h-[95vh] md:h-[90vh] flex flex-col p-0 gap-0 overflow-hidden' : 'max-w-3xl'} transition-all duration-500 shadow-2xl border-none`}>
-          <div className="flex flex-col h-full overflow-hidden bg-background">
-            <DialogHeader className={`px-6 py-4 border-b bg-card z-50 ${isPlaying ? 'flex-row items-center justify-between space-y-0 shrink-0' : ''}`}>
-              <div className="flex items-center gap-4">
-                <div className={`p-2 rounded-lg ${selectedGame?.color} text-white shadow-sm`}>
-                  {selectedGame?.icon && <selectedGame.icon className="w-5 h-5" />}
+        <DialogContent className={`${isPlaying ? 'max-w-[100vw] md:max-w-[95vw] lg:max-w-5xl w-full h-[100dvh] md:h-[90dvh] m-0 md:m-4 flex flex-col p-0 gap-0 overflow-hidden rounded-none md:rounded-[3rem] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]' : 'max-w-3xl rounded-[3rem]'} transition-all duration-500 shadow-2xl border-none sticker-shadow`}>
+          <div className="flex flex-col h-full overflow-hidden bg-background relative pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+            {/* Close button replacement for deep kid-friendly design - already in DialogContent but visual feedback helps */}
+            <DialogHeader className={`px-8 py-6 border-b bg-card z-50 shrink-0 ${isPlaying ? 'flex-row items-center justify-between space-y-0' : ''}`}>
+              <div className="flex items-center gap-5">
+                <div className={`p-3 rounded-2xl ${selectedGame?.color} text-white shadow-lg rotate-[-3deg]`}>
+                  {selectedGame?.icon && <selectedGame.icon className="w-6 h-6" />}
                 </div>
                 <div className="text-left">
-                  <DialogTitle className="text-xl font-bold">
+                  <DialogTitle className="text-2xl font-black font-display text-slate-900 leading-tight">
                     {selectedGame?.title}
                   </DialogTitle>
                   {!isPlaying && (
-                    <DialogDescription className="text-sm">
+                    <DialogDescription className="text-slate-500 font-medium">
                       O'yin qoidalari va yo'riqnoma
                     </DialogDescription>
                   )}
@@ -231,91 +237,106 @@ export function EducationalGames() {
               </div>
               <div className="flex items-center gap-2">
                 {isPlaying && (
-                  <Button variant="ghost" size="sm" onClick={() => setIsPlaying(false)} className="text-muted-foreground hover:text-primary">
-                    <Info className="w-4 h-4 mr-2" />
-                    Qoidalar
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setIsPlaying(false)} 
+                    className="text-slate-400 hover:text-slate-900 font-bold hover:bg-slate-100 rounded-xl"
+                  >
+                    <Info className="w-5 h-5 mr-2" />
+                    Yo'riqnoma
                   </Button>
                 )}
               </div>
             </DialogHeader>
             
-            <div className={`relative ${isPlaying ? 'flex-1 overflow-y-auto overflow-x-hidden p-0 bg-secondary/5' : 'p-6 overflow-y-auto'}`}>
+            <div className={`relative flex-1 flex flex-col items-center justify-center ${isPlaying ? 'overflow-y-auto overflow-x-hidden p-4 bg-orange-50/30' : 'p-8 overflow-y-auto'}`}>
               {!isPlaying ? (
-                <div className="flex flex-col gap-6">
-                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-muted group">
+                <div className="flex flex-col gap-10 w-full max-w-4xl">
+                  <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-muted group sticker-shadow">
                     <img 
                       src={selectedGame?.image || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop"} 
                       alt={selectedGame?.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                      <Badge className={`${selectedGame?.color} border-none text-white px-3 py-1`}>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                      <Badge className={`${selectedGame?.color} border-none text-white px-5 py-2 rounded-xl font-black text-xs tracking-widest uppercase shadow-lg`}>
                         {selectedGame?.category}
                       </Badge>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="md:col-span-2 space-y-4">
-                      <div className="bg-primary/5 p-5 rounded-2xl border border-primary/10">
-                        <h4 className="font-bold text-primary flex items-center gap-2 mb-3">
-                          <BookOpen className="w-5 h-5" />
-                          Vazifa
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-4">
+                    <div className="md:col-span-2 space-y-6">
+                      <div className="bg-white p-8 rounded-[2rem] border-2 border-slate-100 shadow-sm">
+                        <h4 className="font-black text-slate-900 flex items-center gap-3 mb-4 text-xl">
+                          <BookOpen className="w-6 h-6 text-blue-500" />
+                          Nima qilish kerak?
                         </h4>
-                        <p className="text-muted-foreground leading-relaxed">
+                        <p className="text-slate-600 font-medium text-lg leading-relaxed">
                           {selectedGame?.description}
                         </p>
                       </div>
 
-                      <div className="bg-orange-500/5 p-5 rounded-2xl border border-orange-500/10">
-                        <h4 className="font-bold text-orange-600 flex items-center gap-2 mb-3">
-                          <Info className="w-5 h-5" />
-                          Qanday o'ynaladi?
+                      <div className="bg-white p-8 rounded-[2rem] border-2 border-slate-100 shadow-sm">
+                        <h4 className="font-black text-slate-900 flex items-center gap-3 mb-4 text-xl">
+                          <Play className="w-6 h-6 text-orange-500 fill-current" />
+                          O'yin qoidalari
                         </h4>
-                        <p className="text-muted-foreground leading-relaxed">
+                        <p className="text-slate-600 font-medium text-lg leading-relaxed">
                           {selectedGame?.instruction}
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="bg-muted/50 p-4 rounded-xl border flex flex-col gap-3">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-muted-foreground">Qiyinchilik</span>
-                          <Badge variant="secondary">{selectedGame?.difficulty}</Badge>
+                    <div className="space-y-6">
+                      <div className="bg-slate-50 p-6 rounded-[2rem] flex flex-col gap-4 border-2 border-white shadow-inner">
+                        <div className="flex justify-between items-center px-2">
+                          <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">Qiyinchilik</span>
+                          <Badge variant="secondary" className="font-black text-orange-500 bg-orange-100 rounded-lg px-3 py-1">
+                            {selectedGame?.difficulty}
+                          </Badge>
                         </div>
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-muted-foreground">Turi</span>
-                          <span className="font-medium">{selectedGame?.category}</span>
+                        <div className="flex justify-between items-center px-2">
+                          <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">Kategoriya</span>
+                          <span className="font-black text-slate-700">{selectedGame?.category}</span>
                         </div>
                       </div>
                       
-                      <div className="bg-secondary/20 p-4 rounded-xl border border-secondary/30 flex flex-col items-center gap-2 text-center">
-                         <Trophy className="w-8 h-8 text-yellow-500 mb-1" />
-                         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">O'yin maqsadi</span>
-                         <span className="text-sm font-medium">Ko'proq ball to'plab rekord o'rnating!</span>
+                      <div className="bg-yellow-100 p-8 rounded-[2rem] flex flex-col items-center gap-4 text-center sticker-shadow rotate-2">
+                         <div className="bg-white p-4 rounded-3xl shadow-md rotate-[-5deg]">
+                            <Trophy className="w-10 h-10 text-yellow-500" />
+                         </div>
+                         <div className="space-y-1">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700/60 block leading-none">O'yin maqsadi</span>
+                           <span className="text-base font-black text-yellow-800 leading-tight block">Marraga yeting va rekord o'rnating!</span>
+                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="min-h-full w-full flex flex-col items-center">
+                <div className="w-full h-full flex flex-col items-center justify-center">
                   {selectedGame?.component && <selectedGame.component />}
                 </div>
               )}
             </div>
 
-            <div className={`px-6 py-4 border-t bg-card flex justify-end gap-3 shrink-0 ${isPlaying ? 'bg-background' : ''}`}>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">
+            <div className={`px-8 py-6 border-t bg-card flex justify-center md:justify-end gap-6 shrink-0 ${isPlaying ? 'bg-background' : ''}`}>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsDialogOpen(false)} 
+                className="rounded-2xl px-8 h-14 text-lg font-black text-slate-500 hover:bg-slate-50 border-2 border-slate-100"
+              >
                 Yopish
               </Button>
               {!isPlaying && (
                 <Button 
                   disabled={!selectedGame?.component} 
                   onClick={() => setIsPlaying(true)}
-                  className="px-10 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                  className={`px-14 h-14 rounded-2xl text-xl font-black text-white ${selectedGame?.color} hover:brightness-110 shadow-xl shadow-slate-200 border-b-4 border-black/10 active:border-b-0 active:translate-y-1 transition-all`}
                 >
-                  <Play className="w-4 h-4 mr-2 fill-current" />
+                  <Play className="w-5 h-5 mr-3 fill-current" />
                   Boshlash
                 </Button>
               )}

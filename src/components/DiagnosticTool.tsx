@@ -51,51 +51,55 @@ export function DiagnosticTool() {
   };
 
   return (
-    <section className="py-12 px-4 max-w-4xl mx-auto">
-      <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold mb-4">Nutqni Tahlil Qilish</h2>
-        <p className="text-muted-foreground">
-          O'quvchining nutqidagi muammolarni batafsil yozing (masalan: "r" harfini ayta olmaydi, duduqlanadi).
+    <section className="py-12 px-4 max-w-4xl mx-auto min-h-[70vh]">
+      <div className="text-center mb-12">
+        <h2 className="text-4xl md:text-5xl font-black font-display text-slate-900 mb-4 bg-gradient-to-r from-sky-500 to-emerald-500 bg-clip-text text-transparent">
+          Nutqni Tahlil Qilamiz! 🔍
+        </h2>
+        <p className="text-xl text-slate-500 font-medium">
+          O'quvchining nutqidagi muammolarni batafsil yozing, biz esa yordamlashamiz!
         </p>
       </div>
 
-      <Card className="mb-8 border-2 border-primary/20 shadow-xl overflow-hidden">
-        <div className="h-2 bg-primary/10 w-full overflow-hidden">
+      <Card className="mb-10 rounded-3xl border-4 border-sky-100 shadow-xl overflow-hidden sticker-shadow bg-white relative">
+        <div className="absolute top-0 left-0 right-0 h-3 bg-sky-200/50 w-full overflow-hidden">
           {loading && <motion.div 
-            className="h-full bg-primary"
+            className="h-full bg-sky-500"
             initial={{ x: "-100%" }}
             animate={{ x: "100%" }}
             transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
           />}
         </div>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
+        <CardHeader className="pt-8">
+          <CardTitle className="flex items-center gap-3 text-2xl font-black font-display text-sky-600">
+            <div className="bg-sky-100 p-2 rounded-xl">
+              <Sparkles className="w-6 h-6 text-sky-500 animate-pulse" />
+            </div>
             Tavsif kiriting
           </CardTitle>
-          <CardDescription>AI yordamida dastlabki tashxis qo'yish</CardDescription>
+          <CardDescription className="text-lg font-medium text-slate-400">AI yordamida dastlabki tashxis qo'yish</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-8">
           <textarea
-            className="w-full min-h-[150px] p-4 rounded-xl border-2 border-muted focus:border-primary outline-none transition-all resize-none text-lg bg-muted/30"
+            className="w-full min-h-[180px] p-6 rounded-2xl border-4 border-slate-50 focus:border-sky-300 outline-none transition-all resize-none text-xl bg-slate-50/50 font-medium text-slate-700 placeholder:text-slate-300"
             placeholder="Masalan: O'quvchi gapirganda ba'zi tovushlarni tushirib qoldiradi, ayniqsa 'l' va 'r' tovushlarida qiynaladi..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
           <Button 
-            className="w-full mt-4 h-14 text-lg font-bold shadow-lg shadow-primary/20" 
+            className="w-full mt-6 h-18 text-2xl font-black rounded-2xl shadow-xl bg-sky-500 hover:bg-sky-600 border-b-8 border-sky-700 active:border-b-0 active:translate-y-2 transition-all sticker-shadow" 
             onClick={handleAnalyze}
             disabled={loading || !description.trim()}
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                <Loader2 className="mr-3 h-8 w-8 animate-spin" />
                 Tahlil qilinmoqda...
               </>
             ) : (
               <>
-                <Send className="mr-2 h-6 w-6" />
-                Tahlilni boshlash
+                <Send className="mr-3 h-8 w-8" />
+                Natijani bilish!
               </>
             )}
           </Button>

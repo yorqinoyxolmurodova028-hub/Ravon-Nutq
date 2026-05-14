@@ -229,69 +229,69 @@ export function WordBuilderGame() {
   }
 
   return (
-    <div className={`flex flex-col items-center gap-6 py-4 px-4 w-full transition-all duration-300 ${showFlash ? 'ring-8 ring-red-500 ring-inset rounded-3xl' : ''}`}>
+    <div className={`flex flex-col items-center gap-4 py-2 px-2 w-full h-full justify-center transition-all duration-300 ${showFlash ? 'ring-8 ring-red-500 ring-inset rounded-[3rem]' : ''}`}>
       {/* Header with Stats and Timer */}
-      <div className="w-full bg-white/80 backdrop-blur-md p-4 rounded-3xl shadow-lg border-2 border-blue-100 flex flex-col gap-4">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-md p-4 rounded-[2rem] shadow-sm border-2 border-blue-50 flex flex-col gap-3 sticker-shadow">
         <div className="flex justify-between items-center w-full">
             <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-sm font-bold bg-blue-50 text-blue-700 border-blue-100 px-3 py-1">
+                <Badge variant="secondary" className="text-xs font-black bg-blue-100 text-blue-600 rounded-lg px-3 py-1">
                    {currentLevelIdx + 1}-bosqich
                 </Badge>
-                <Badge variant="outline" className="text-xs font-medium uppercase tracking-tighter">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
                    {currentLevel.difficulty}
-                </Badge>
+                </div>
             </div>
-            <div className="flex items-center gap-1.5 text-yellow-600 font-black text-2xl">
-                <Star className="fill-yellow-500 w-6 h-6" />
+            <div className="flex items-center gap-1.5 text-orange-500 font-black text-3xl font-display">
+                <Star className="fill-current w-7 h-7" />
                 {score}
             </div>
         </div>
 
         {/* Improved Timer Bar */}
         <div className="space-y-1">
-            <div className="flex justify-between items-end px-1">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Qolgan vaqt</span>
-                <span className={`text-sm font-black transition-colors ${timeLeft < 4 ? 'text-red-600 animate-pulse' : 'text-blue-600'}`}>
-                    {timeLeft}s
-                </span>
-            </div>
-            <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+            <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200 shadow-inner">
                 <motion.div 
                     initial={{ width: "100%" }}
                     animate={{ width: `${(timeLeft / 10) * 100}%` }}
                     transition={{ duration: 1, ease: "linear" }}
-                    className={`h-full shadow-inner ${timeLeft < 4 ? 'bg-red-500' : 'bg-blue-500'}`}
+                    className={`h-full shadow-inner ${timeLeft < 4 ? 'bg-orange-500' : 'bg-blue-500'}`}
                 />
+            </div>
+            <div className="flex justify-between items-center px-1">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qolgan vaqt</span>
+                <span className={`text-[10px] font-black transition-colors ${timeLeft < 4 ? 'text-orange-600 animate-pulse' : 'text-blue-500'}`}>
+                    {timeLeft}s
+                </span>
             </div>
         </div>
       </div>
 
       {/* Level Content */}
-      <div className="text-center space-y-4 w-full mt-4">
-        <div className="flex flex-col items-center gap-2">
+      <div className="text-center space-y-2 w-full">
+        <div className="flex flex-col items-center gap-1">
             <motion.div 
                 key={currentLevel.icon}
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="text-7xl md:text-8xl drop-shadow-lg"
+                className="text-6xl md:text-7xl filter drop-shadow-md select-none"
             >
                 {currentLevel.icon}
             </motion.div>
-            <h4 className="text-3xl font-black text-blue-900 tracking-tight">
+            <h4 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">
                 {currentLevel.type === "word" ? "So'zni yig'ing" : "Gapni yig'ing"}
             </h4>
         </div>
       </div>
 
-      {/* Selected Parts */}
-      <div className={`flex flex-wrap gap-4 min-h-[6rem] items-center justify-center w-full border-4 border-dashed rounded-[2rem] px-8 py-6 transition-all shadow-inner 
-        ${isCorrect === false ? 'border-red-300 bg-red-50' : 'border-blue-100 bg-blue-50/50'}`}>
+      {/* Selected Parts Area */}
+      <div className={`flex flex-wrap gap-2 md:gap-3 min-h-[5rem] items-center justify-center w-full max-w-xl border-4 border-dashed rounded-[2.5rem] px-6 py-5 transition-all shadow-inner 
+        ${isCorrect === false ? 'border-orange-300 bg-orange-50' : 'border-blue-100 bg-blue-50/50'}`}>
         <AnimatePresence mode="popLayout">
           {selectedParts.length === 0 && (
              <motion.p 
                initial={{ opacity: 0 }}
                animate={{ opacity: 0.4 }}
-               className="text-blue-900 font-bold uppercase tracking-widest text-sm"
+               className="text-blue-900 font-black uppercase tracking-[0.2em] text-[10px] text-center"
              >
                 Bloklarni tanlang
              </motion.p>
@@ -302,10 +302,10 @@ export function WordBuilderGame() {
               initial={{ y: 20, opacity: 0, scale: 0.8 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
-              className={`px-5 py-3 flex items-center justify-center text-2xl md:text-3xl font-black rounded-2xl shadow-xl border-b-8 
-                ${isCorrect === true ? 'bg-green-500 text-white border-green-700' : 
-                  isCorrect === false ? 'bg-red-500 text-white border-red-700 animate-shake' : 
-                  'bg-white text-blue-900 border-blue-200'}`}
+              className={`px-4 py-2 flex items-center justify-center text-xl md:text-2xl font-black rounded-2xl shadow-md border-b-4 
+                ${isCorrect === true ? 'bg-emerald-500 text-white border-emerald-700' : 
+                  isCorrect === false ? 'bg-orange-500 text-white border-orange-700 animate-shake' : 
+                  'bg-white text-slate-800 border-slate-200'}`}
             >
               {s}
             </motion.div>
@@ -313,20 +313,20 @@ export function WordBuilderGame() {
         </AnimatePresence>
       </div>
 
-      {/* Options */}
-      <div className="flex flex-wrap gap-4 justify-center items-center min-h-[140px] w-full pt-4 max-w-2xl">
+      {/* Options Controls */}
+      <div className="flex flex-wrap gap-3 justify-center items-center min-h-[120px] w-full pt-2 max-w-2xl px-4">
         {shuffledParts.map((s, i) => (
           <motion.button
             key={`shuffled-${i}-${s}`}
-            whileHover={{ scale: 1.1, y: -8, rotate: Math.random() * 6 - 3 }}
+            whileHover={{ scale: 1.1, y: -4, rotate: Math.random() * 4 - 2 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => handlePartClick(s, i)}
-            className={`flex items-center justify-center font-black bg-white rounded-[2rem] shadow-[0_12px_24px_rgba(0,0,0,0.1)] hover:shadow-xl hover:bg-blue-50 transition-all text-blue-900 border-2 border-blue-50 relative overflow-hidden group
-               ${currentLevel.type === "word" ? "w-24 h-24 text-3xl" : "px-10 py-5 text-2xl"}`}
+            className={`flex items-center justify-center font-black bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:bg-white transition-all text-slate-800 border-2 border-slate-50 relative overflow-hidden group sticker-shadow
+               ${currentLevel.type === "word" ? "w-20 h-20 text-2xl" : "px-8 py-4 text-xl"}`}
           >
-            {/* Glossy Effect */}
-            <div className="absolute top-2 left-1/4 w-1/2 h-1/4 bg-white/40 rounded-full blur-[2px] pointer-events-none" />
-            <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-blue-500/5 rounded-full pointer-events-none group-hover:bg-blue-500/10 transition-colors" />
+            {/* Glossy / Sticker Effect */}
+            <div className="absolute top-1.5 left-1.5 w-1/3 h-1/3 bg-white/50 rounded-full blur-[4px] pointer-events-none" />
+            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500/5 rounded-full pointer-events-none" />
             
             <span className="relative z-10">{s}</span>
           </motion.button>

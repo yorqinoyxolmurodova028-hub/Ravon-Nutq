@@ -25,6 +25,7 @@ export function VoiceControlledGame() {
   const [showFlash, setShowFlash] = useState(false);
   const [lives, setLives] = useState(3);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -118,7 +119,7 @@ export function VoiceControlledGame() {
         audioContextRef.current.resume();
     }
     gameState.current = {
-      ballY: 150,
+      ballY: canvasRef.current ? canvasRef.current.height / 2 : 150,
       ballVelocity: 0,
       obstacles: [],
       frame: 0,
@@ -169,6 +170,11 @@ export function VoiceControlledGame() {
       return;
     }
 
+    // Rendering
+    const scale = canvas.height / 600; // Logical height of 600
+    const logicalWidth = canvas.width / scale;
+    const logicalHeight = 600;
+
     // Volume detection
     if (analyserRef.current && dataArrayRef.current) {
       analyserRef.current.getByteFrequencyData(dataArrayRef.current);
@@ -190,16 +196,14 @@ export function VoiceControlledGame() {
         gameState.current.ballVelocity -= effectiveVol * LIFT_COEFFICIENT;
     }
     
-    // Manual impulses are handled in event listeners directly subtracting from velocity
-    
     // Clamp
     if (gameState.current.ballVelocity > MAX_VELOCITY) gameState.current.ballVelocity = MAX_VELOCITY;
     if (gameState.current.ballVelocity < -MAX_VELOCITY) gameState.current.ballVelocity = -MAX_VELOCITY;
 
     gameState.current.ballY += gameState.current.ballVelocity;
 
-    // Check bounds
-    if (gameState.current.ballY < 20 || gameState.current.ballY > canvas.height - 20) {
+    // Check bounds (logical)
+    if (gameState.current.ballY < 20 || gameState.current.ballY > logicalHeight - 20) {
       setShowFlash(true);
       if (navigator.vibrate) navigator.vibrate(200);
       setTimeout(() => setShowFlash(false), 300);
@@ -207,26 +211,26 @@ export function VoiceControlledGame() {
       return;
     }
 
-    // Obstacle spacing (INCREASED DISTANCE)
+    // Obstacle spacing (logical)
     const spawnFreq = Math.max(250, Math.floor(550 / (gameState.current.speed / MIN_SPEED)));
     if (gameState.current.frame % spawnFreq === 0) {
-      const gap = 220;
-      const minH = 40;
-      const maxH = canvas.height - gap - minH;
+      const gap = 240;
+      const minH = 60;
+      const maxH = logicalHeight - gap - minH;
       const h = Math.random() * (maxH - minH) + minH;
       
       gameState.current.obstacles.push({
-        x: canvas.width,
+        x: logicalWidth,
         y: 0,
-        width: 50,
+        width: 60,
         height: h,
         passed: false
       });
       gameState.current.obstacles.push({
-        x: canvas.width,
+        x: logicalWidth,
         y: h + gap,
-        width: 50,
-        height: canvas.height - (h + gap),
+        width: 60,
+        height: logicalHeight - (h + gap),
         passed: false
       });
     }
@@ -238,9 +242,9 @@ export function VoiceControlledGame() {
 
     // Move obstacles
     gameState.current.obstacles.forEach((o) => {
-      o.x -= gameState.current.speed;
+      o.x -= gameState.current.speed * 4; // Adjust speed for logical coordinate system
     });
-    gameState.current.obstacles = gameState.current.obstacles.filter(o => o.x > -100);
+    gameState.current.obstacles = gameState.current.obstacles.filter(o => o.x > -200);
 
     // Collision & Score
     const ballX = 150;
@@ -267,8 +271,7 @@ export function VoiceControlledGame() {
         if (lives > 1) {
           setLives(prev => prev - 1);
           setWarningMessage("Ehtiyot bo'ling! ⚠️");
-          gameState.current.invincible = 90; // About 1.5 seconds at 60fps
-          // Remove the obstacle pair that was hit
+          gameState.current.invincible = 90;
           const pairIndex = Math.floor(i / 2) * 2;
           gameState.current.obstacles.splice(pairIndex, 2);
           setTimeout(() => setWarningMessage(null), 2000);
@@ -284,7 +287,6 @@ export function VoiceControlledGame() {
     for (const o of gameState.current.obstacles) {
       if (!o.passed && o.x + o.width < ballX) {
         o.passed = true;
-        // Obstacles are added in pairs (top/bottom), only increment score for one of them
         if (gameState.current.obstacles.indexOf(o) % 2 === 0) {
           setScore(s => s + 1);
           const audioClone = successAudioRef.current?.cloneNode(true) as HTMLAudioElement;
@@ -295,23 +297,25 @@ export function VoiceControlledGame() {
       }
     }
 
-    // Rendering
+    // Rendering with scaling
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.scale(scale, scale);
     
-    // Draw Sky Background
-    const skyGrd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    // Draw Sky Background (logical dimensions)
+    const skyGrd = ctx.createLinearGradient(0, 0, 0, logicalHeight);
     skyGrd.addColorStop(0, "#bae6fd");
     skyGrd.addColorStop(1, "#f0f9ff");
     ctx.fillStyle = skyGrd;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
     // Draw clouds (simple circles)
     ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-    const cloudOffset = (gameState.current.frame * 0.5) % 800;
+    const cloudOffset = (gameState.current.frame * 0.5) % (logicalWidth + 200);
     ctx.beginPath();
-    ctx.arc(400 - cloudOffset, 100, 30, 0, Math.PI*2);
-    ctx.arc(430 - cloudOffset, 110, 40, 0, Math.PI*2);
-    ctx.arc(460 - cloudOffset, 100, 30, 0, Math.PI*2);
+    ctx.arc(logicalWidth - cloudOffset, 100, 30, 0, Math.PI*2);
+    ctx.arc(logicalWidth + 30 - cloudOffset, 110, 40, 0, Math.PI*2);
+    ctx.arc(logicalWidth + 60 - cloudOffset, 100, 30, 0, Math.PI*2);
     ctx.fill();
 
     // Draw Obstacles
@@ -399,14 +403,42 @@ export function VoiceControlledGame() {
        ctx.strokeRect(-28, -32, 56, 75);
     }
     
-    ctx.restore();
+    ctx.restore(); // Character restore
+    ctx.restore(); // Scaling restore
 
     gameState.current.frame++;
     animationFrameRef.current = requestAnimationFrame(gameLoop);
   };
 
+  // Touch Events
+  const handleTouchStart = (e: TouchEvent) => {
+    if (isGamingRef.current) {
+        e.preventDefault();
+        gameState.current.ballVelocity -= 6;
+        manualLiftRef.current = true;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    manualLiftRef.current = false;
+  };
+
   useEffect(() => {
     if (isGaming) {
+      // Resize handling
+      const updateCanvasSize = () => {
+        if (containerRef.current && canvasRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const dpr = window.devicePixelRatio || 1;
+          canvasRef.current.width = rect.width * dpr;
+          canvasRef.current.height = rect.height * dpr;
+        }
+      };
+
+      const resizeObserver = new ResizeObserver(updateCanvasSize);
+      if (containerRef.current) resizeObserver.observe(containerRef.current);
+      updateCanvasSize();
+
       animationFrameRef.current = requestAnimationFrame(gameLoop);
       
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -435,12 +467,19 @@ export function VoiceControlledGame() {
       window.addEventListener("keyup", handleKeyUp);
       window.addEventListener("mousedown", handleMouseDown);
       window.addEventListener("mouseup", handleMouseUp);
+      containerRef.current?.addEventListener("touchstart", handleTouchStart, { passive: false });
+      window.addEventListener("touchend", handleTouchEnd);
+      window.addEventListener("touchcancel", handleTouchEnd);
       
       return () => {
+        resizeObserver.disconnect();
         window.removeEventListener("keydown", handleKeyDown);
         window.removeEventListener("keyup", handleKeyUp);
         window.removeEventListener("mousedown", handleMouseDown);
         window.removeEventListener("mouseup", handleMouseUp);
+        containerRef.current?.removeEventListener("touchstart", handleTouchStart);
+        window.removeEventListener("touchend", handleTouchEnd);
+        window.removeEventListener("touchcancel", handleTouchEnd);
       };
     } else {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
@@ -448,7 +487,7 @@ export function VoiceControlledGame() {
   }, [isGaming]);
 
   return (
-    <div className={`p-4 sm:p-6 bg-gradient-to-br from-sky-50 to-blue-50 rounded-3xl shadow-xl transition-all duration-300 w-full flex flex-col items-center justify-center ${showFlash ? 'ring-8 ring-red-400 ring-inset' : ''}`}>
+    <div ref={containerRef} className={`p-4 md:p-8 bg-gradient-to-br from-sky-100 to-blue-50 rounded-[3rem] shadow-xl transition-all duration-300 w-full h-full flex flex-col items-center justify-center relative overflow-hidden sticker-shadow ${showFlash ? 'ring-8 ring-rose-400 ring-inset' : ''}`}>
       <audio 
         ref={bgMusicRef} 
         src={GAME_BG_MUSIC_URL} 
@@ -459,73 +498,106 @@ export function VoiceControlledGame() {
         {!isGaming && !gameOver ? (
           <motion.div 
             key="start"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            className="text-center space-y-6 max-w-lg"
+            className="text-center space-y-8 max-w-lg z-10"
           >
             <div className="relative inline-block">
-                <div className="w-24 h-24 bg-primary rounded-3xl flex items-center justify-center shadow-lg transform -rotate-6 animate-bounce">
-                <Music2 className="w-12 h-12 text-white" />
-                </div>
-                <div className="absolute -right-2 -top-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-md animate-pulse">
-                <Mic className="w-4 h-4 text-white" />
-                </div>
+                <motion.div 
+                  animate={{ 
+                    rotate: [-5, 5, -5],
+                    y: [0, -10, 0]
+                  }}
+                  transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                  className="w-28 h-28 bg-blue-600 rounded-[2rem] flex items-center justify-center shadow-2xl border-b-8 border-blue-800"
+                >
+                  <Music2 className="w-14 h-14 text-white" />
+                </motion.div>
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="absolute -right-4 -top-4 w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center shadow-xl border-4 border-white"
+                >
+                  <Mic className="w-6 h-6 text-white" />
+                </motion.div>
             </div>
-            <h3 className="text-3xl font-black text-blue-900 capitalize">Ovozli Parvoz</h3>
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              Bu o'yinda qahramonimizni ovoz balandligi yordamida boshqarasiz. 
-              <span className="block font-bold text-primary mt-2">Baland ovoz = Yuqoriga ko'tarilish!</span>
-            </p>
             
-            <div className="flex flex-col gap-4 mt-8">
+            <div className="space-y-2">
+              <h3 className="text-4xl font-black text-slate-800 font-display">Ovozli Parvoz 🚀</h3>
+              <p className="text-slate-500 text-lg font-medium leading-relaxed">
+                Qahramonimizni ovozingiz bilan boshqaring! <br/>
+                <span className="text-blue-600 font-black">Baland ovoz = Yuqoriga ko'tarilish!</span>
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-4">
               {micError && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-600 text-sm mb-4">
+                <div className="p-5 bg-rose-50 border-2 border-rose-100 rounded-2xl text-rose-600 text-sm font-bold shadow-inner">
                   {micError}
                 </div>
               )}
               
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button onClick={startMic} size="lg" className="h-16 text-xl rounded-full px-12 shadow-lg bg-red-500 hover:bg-red-600">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={startMic} 
+                  className="h-16 text-xl rounded-2xl px-12 bg-rose-500 hover:bg-rose-600 shadow-xl shadow-rose-200 border-b-4 border-rose-800 active:border-b-0 active:translate-y-1 font-black transition-all"
+                >
                   <Mic className="mr-3 w-6 h-6" />
-                  Ovoz bilan boshlash
+                  Ovoz bilan!
                 </Button>
                 
-                <Button variant="outline" onClick={startManualMode} size="lg" className="h-16 text-lg rounded-full px-8">
-                   Sichqoncha bilan boshlash
+                <Button 
+                  variant="outline" 
+                  onClick={startManualMode} 
+                  className="h-16 text-lg rounded-2xl px-8 border-2 border-slate-200 bg-white hover:bg-slate-50 font-black text-slate-500 transition-all"
+                >
+                   Sichqoncha bilan
                 </Button>
               </div>
               
-              <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
-                Nutq nafasini va ovoz kuchini nazorat qilish mashqi
-              </p>
+              <div className="pt-4 flex items-center justify-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-[0.2em]">
+                <div className="h-[2px] w-8 bg-slate-200 rounded-full" />
+                Ovoz kuchi mashqi
+                <div className="h-[2px] w-8 bg-slate-200 rounded-full" />
+              </div>
             </div>
           </motion.div>
         ) : gameOver ? (
           <motion.div 
             key="over"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="text-center space-y-6"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-center space-y-8 z-10"
           >
             <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 0.5 }}
-                className="w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center shadow-2xl mx-auto border-8 border-white"
+                animate={{ 
+                  rotate: [0, -10, 10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ duration: 0.5, repeat: 1 }}
+                className="w-36 h-36 bg-yellow-400 rounded-[2.5rem] flex items-center justify-center shadow-2xl mx-auto border-8 border-white sticker-shadow"
             >
-                <Trophy className="w-16 h-16 text-white" />
+                <Trophy className="w-20 h-20 text-white" />
             </motion.div>
-            <h3 className="text-4xl font-black text-blue-900">Parvoz yakunlandi!</h3>
-            <div className="space-y-1">
-                <p className="text-muted-foreground font-bold">Sizning balingiz:</p>
-                <div className="text-7xl font-black text-blue-600">{score}</div>
+            
+            <div className="space-y-2">
+                <h3 className="text-4xl font-black text-slate-800 font-display">Parvoz yakunlandi!</h3>
+                <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Sizning natijangiz</p>
+                <div className="text-8xl font-black text-blue-600 font-display drop-shadow-lg">{score}</div>
             </div>
-            <div className="flex flex-col gap-3 max-w-xs mx-auto">
-                <Button onClick={initGame} size="lg" className="h-14 rounded-full text-lg shadow-md px-10">
-                    <RotateCcw className="mr-2 w-5 h-5" />
-                    Qayta urinish
+            
+            <div className="flex flex-col gap-4 max-w-xs mx-auto">
+                <Button 
+                  onClick={initGame} 
+                  className="h-16 rounded-2xl text-xl font-black bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all px-12"
+                >
+                    <RotateCcw className="mr-3 w-6 h-6" />
+                    Yana bir marta!
                 </Button>
-                <Badge variant="secondary" className="text-sm">Eng yuqori natija: {highScore}</Badge>
+                <div className="bg-white/80 backdrop-blur-sm px-6 py-2 rounded-xl text-sm font-black text-slate-400 border border-slate-100 uppercase tracking-widest">
+                  Eng yaxshisi: {highScore}
+                </div>
             </div>
           </motion.div>
         ) : (
@@ -533,52 +605,52 @@ export function VoiceControlledGame() {
             key="game"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-sky-100 min-h-[300px]"
+            className="relative w-full h-full min-h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white bg-sky-200 sticker-shadow touch-none"
           >
             <canvas 
               ref={canvasRef} 
-              width={1000} 
-              height={500} 
-              className="absolute inset-0 w-full h-full block"
+              className="absolute inset-0 w-full h-full block cursor-pointer"
             />
-            <div className="absolute inset-0 pointer-events-none z-20">
+            <div className="absolute inset-0 pointer-events-none z-20 p-6">
               {/* Top HUD: Score & Lives */}
-              <div className="absolute top-2 left-0 right-0 px-4 flex justify-between items-center pointer-events-auto">
+              <div className="flex justify-between items-start w-full">
                 <motion.div
                   key={score}
-                  initial={{ scale: 1.1, y: -10 }}
+                  initial={{ scale: 1.2, y: -20 }}
                   animate={{ scale: 1, y: 0 }}
-                  className="bg-yellow-400/90 backdrop-blur-sm px-3 py-1.5 rounded-xl border-b-4 border-yellow-600 flex items-center gap-2 shadow-md"
+                  className="bg-yellow-400 px-5 py-3 rounded-2xl border-b-4 border-yellow-600 flex items-center gap-3 shadow-xl"
                 >
-                  <Trophy className="w-4 h-4 text-white" />
-                  <span className="text-xl font-black text-white">{score}</span>
+                  <Trophy className="w-5 h-5 text-white" />
+                  <span className="text-3xl font-black text-white font-display leading-none">{score}</span>
                 </motion.div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-1 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full border border-gray-100 shadow-sm">
+                <div className="flex flex-col items-end gap-3">
+                  <div className="flex gap-1.5 bg-white/90 backdrop-blur-sm p-3 rounded-2xl shadow-lg border-2 border-white">
                       {[...Array(3)].map((_, i) => (
-                          <Heart key={i} className={`w-3.5 h-3.5 ${i < lives ? 'text-red-500 fill-red-500' : 'text-gray-300'}`} />
+                          <Heart 
+                            key={i} 
+                            className={`w-5 h-5 transition-all duration-300 ${i < lives ? 'text-rose-500 fill-rose-500 scale-110' : 'text-slate-200 opacity-30 scale-90'}`} 
+                          />
                       ))}
                   </div>
                   <Button 
                     variant="secondary" 
                     size="icon" 
-                    className="rounded-full shadow-lg w-8 h-8 bg-white/90"
+                    className="rounded-2xl shadow-lg w-12 h-12 bg-white/90 hover:bg-white text-slate-500 pointer-events-auto border-2 border-white"
                     onClick={() => setIsGaming(false)}
                   >
-                    <RotateCcw className="w-4 h-4 text-gray-600" />
+                    <RotateCcw className="w-6 h-6" />
                   </Button>
                 </div>
               </div>
 
-              {/* Bottom HUD: Volume */}
-              <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-3 px-4">
-                {/* Volume Bar */}
+              {/* Bottom Volume Indicator */}
+              <div className="absolute bottom-6 left-6 right-6 flex flex-col items-center gap-3">
                 {!isManualMode && (
-                   <div className="w-24 h-1 bg-black/20 rounded-full overflow-hidden border border-white/5">
+                   <div className="w-full max-w-xs h-3 bg-black/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/20">
                         <motion.div 
                             animate={{ width: `${Math.min(gameState.current.volume, 100)}%` }}
-                            className={`h-full ${gameState.current.volume > gameState.current.sensitivity ? 'bg-green-400' : 'bg-blue-400'}`}
+                            className={`h-full transition-colors duration-300 ${gameState.current.volume > gameState.current.sensitivity ? 'bg-emerald-400 shadow-[0_0_10px_#34d399]' : 'bg-blue-400'}`}
                         />
                    </div>
                 )}
@@ -590,22 +662,16 @@ export function VoiceControlledGame() {
                   {warningMessage && (
                     <motion.div
                       key="warning"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 1.2 }}
-                      className="bg-red-500 text-white font-black px-6 py-2 rounded-2xl shadow-xl border-2 border-white/20"
+                      initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 1.5 }}
+                      className="bg-rose-500 text-white font-black px-10 py-4 rounded-3xl shadow-2xl border-4 border-white/50 text-2xl uppercase tracking-widest"
                     >
-                      <span className="text-lg">{warningMessage}</span>
+                      {warningMessage}
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
-            </div>
-            
-            <div className="absolute bottom-2 left-0 right-0 text-center pointer-events-none opacity-30">
-                <p className="text-blue-900 font-bold uppercase tracking-tighter text-[8px]">
-                   {isManualMode ? 'Bosing yoki Space ishlating' : `Mikrofon faol`}
-                </p>
             </div>
           </motion.div>
         )}

@@ -92,114 +92,123 @@ const lessonModules = [
 
 export function TextbookIntegration() {
   return (
-    <section className="py-12 px-4 max-w-6xl mx-auto">
+    <section className="py-12 px-4 max-w-6xl mx-auto pb-40">
       <div className="flex flex-col items-center text-center mb-16">
         <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-3 rounded-2xl bg-secondary/10 text-secondary-foreground mb-4"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="p-5 rounded-[2rem] bg-emerald-100 text-emerald-600 mb-6 sticker-shadow"
         >
-          <Layout className="w-10 h-10" />
+          <Layout className="w-12 h-12" />
         </motion.div>
-        <h2 className="text-4xl font-bold mb-4">Darslik bilan Integratsiya</h2>
-        <p className="text-muted-foreground max-w-3xl text-lg">
-          Ona tili darslarini logopedik korreksiya bilan birlashtirish. 
-          Interfaol metodlar orqali o'quv dasturini o'zlashtirish va nutq nuqsonlarini bartaraf etish.
+        <h2 className="text-5xl md:text-6xl font-black font-display text-slate-900 mb-4 bg-gradient-to-r from-emerald-500 to-sky-500 bg-clip-text text-transparent">
+          Darslik bilan Integratsiya 📖
+        </h2>
+        <p className="text-2xl text-slate-500 font-medium max-w-3xl">
+          Maktab darsliklarini o'qish endi yanada qiziqarli! 
+          Keling, Ona tili darslarini o'yinlar bilan birga o'rganamiz.
         </p>
       </div>
 
-      <div className="grid gap-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {lessonModules.map((module, idx) => (
             <Card 
               key={idx} 
-              className="bg-primary/5 border-none shadow-sm hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white border-4 border-emerald-50 rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all cursor-pointer group sticker-shadow relative overflow-hidden"
               onClick={() => {
                 if (module.textbookLink && module.textbookLink !== "#") {
                   window.open(module.textbookLink, "_blank");
                 }
               }}
             >
-              <CardHeader className="text-center">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 text-primary font-bold shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
-                  {idx + 1}
+              <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-50 rounded-bl-[2.5rem] flex items-center justify-center text-emerald-500 font-black text-xl">
+                {idx + 1}
+              </div>
+              <CardHeader className="text-center pt-10 pb-8">
+                <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-600 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-inner">
+                  <GraduationCap className="w-10 h-10" />
                 </div>
-                <CardTitle>{module.grade}</CardTitle>
-                <CardDescription>Ona tili darsliklari uchun</CardDescription>
+                <CardTitle className="text-3xl font-black font-display text-slate-800">{module.grade}</CardTitle>
+                <CardDescription className="text-base font-bold text-emerald-500 mt-2">Darsliklar to'plami</CardDescription>
               </CardHeader>
             </Card>
           ))}
         </div>
 
-        <div className="space-y-6">
-          <h3 className="text-2xl font-bold flex items-center gap-2 mb-6">
-            <Presentation className="text-secondary-foreground w-7 h-7" />
-            Interfaol Metodik Tavsiyalar
+        <div className="space-y-8 mt-8">
+          <h3 className="text-3xl font-black font-display flex items-center gap-4 mb-8 text-slate-900 bg-white w-fit px-6 py-3 rounded-2xl sticker-shadow">
+            <Presentation className="text-orange-500 w-10 h-10" />
+            Interfaol Tavsiyalar ✨
           </h3>
           
-          <Accordion type="single" collapsible className="w-full space-y-4">
+          <Accordion type="single" collapsible className="w-full space-y-6">
             {lessonModules.map((module, index) => (
               <AccordionItem 
                 key={index} 
                 value={`item-${index}`}
-                className="border rounded-2xl px-6 bg-white overflow-hidden"
+                className="border-4 border-slate-50 rounded-[2.5rem] px-8 bg-white overflow-hidden sticker-shadow-hover transition-all hover:bg-slate-50/50"
               >
-                <AccordionTrigger className="hover:no-underline py-6">
-                  <div className="flex items-center gap-4 text-left">
-                    <Badge variant="secondary" className="bg-primary/10 text-primary px-3 py-1">
+                <AccordionTrigger className="hover:no-underline py-8">
+                  <div className="flex items-center gap-6 text-left">
+                    <Badge className="bg-emerald-100 text-emerald-600 border-none px-4 py-2 rounded-2xl font-black text-sm">
                       {module.grade}
                     </Badge>
                     <div>
-                      <h4 className="font-bold text-xl">{module.topic}</h4>
-                      <p className="text-sm text-muted-foreground">{module.subject}</p>
+                      <h4 className="font-black font-display text-2xl text-slate-800">{module.topic}</h4>
+                      <p className="text-lg text-slate-400 font-medium">{module.subject}</p>
                     </div>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="pb-8">
-                  <div className="grid gap-8 pt-4">
-                    <div className="p-4 rounded-xl bg-green-50 border border-green-100 flex items-start gap-3">
-                      <CheckCircle2 className="text-green-600 w-5 h-5 shrink-0 mt-1" />
+                <AccordionContent className="pb-10">
+                  <div className="grid gap-10 pt-6">
+                    <div className="p-6 rounded-[2rem] bg-emerald-50 border-4 border-emerald-100 flex items-start gap-4">
+                      <div className="bg-emerald-500 p-2 rounded-xl mt-1">
+                        <CheckCircle2 className="text-white w-6 h-6 shrink-0" />
+                      </div>
                       <div>
-                        <span className="font-bold text-green-900">Korreksion maqsad: </span>
-                        <span className="text-green-800">{module.correctionGoal}</span>
+                        <span className="font-black text-emerald-900 text-xl block mb-1">Asosiy maqsad:</span>
+                        <span className="text-emerald-800 text-lg font-medium leading-relaxed">{module.correctionGoal}</span>
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid md:grid-cols-2 gap-8">
                       {module.methods.map((method, mIdx) => (
-                        <div key={mIdx} className="space-y-3 p-5 rounded-2xl bg-muted/50 border border-border">
-                          <div className="flex items-center gap-2 text-primary font-bold">
-                            <Lightbulb className="w-5 h-5" />
+                        <div key={mIdx} className="space-y-4 p-8 rounded-[2.5rem] bg-slate-50 border-4 border-white shadow-inner">
+                          <div className="flex items-center gap-3 text-orange-500 font-black text-xl font-display">
+                            <Lightbulb className="w-7 h-7" />
                             {method.name}
                           </div>
-                          <p className="text-sm leading-relaxed">
-                            <span className="font-semibold">O'qituvchi uchun: </span>
+                          <p className="text-lg font-medium text-slate-600 leading-relaxed">
+                            <span className="font-black text-slate-900">Ustoz uchun: </span>
                             {method.steps}
                           </p>
-                          <div className="p-3 rounded-lg bg-white border border-border text-sm font-medium text-secondary-foreground">
-                            <span className="text-xs uppercase text-muted-foreground block mb-1">Interfaol element:</span>
+                          <div className="p-5 rounded-2xl bg-white border-2 border-slate-100 text-lg font-bold text-sky-600 sticker-shadow-inner">
+                            <span className="text-xs uppercase font-black text-slate-300 block mb-2 tracking-widest leading-none">Interfaol o'yin:</span>
                             {method.interactive}
                           </div>
                         </div>
                       ))}
                     </div>
                     
-                    <div className="flex justify-end gap-3 mt-4">
+                    <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
                       <Button 
                         variant="outline" 
-                        size="sm"
-                        onClick={() => {
+                        size="lg"
+                        className="rounded-2xl h-14 px-8 border-4 border-emerald-100 font-black text-emerald-600 hover:bg-emerald-50"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (module.textbookLink && module.textbookLink !== "#") {
                             window.open(module.textbookLink, "_blank");
                           }
                         }}
                       >
-                        <BookOpen className="mr-2 w-4 h-4" />
+                        <BookOpen className="mr-3 w-6 h-6" />
                         Darslikni ko'rish
                       </Button>
-                      <Button size="sm">
-                        <GraduationCap className="mr-2 w-4 h-4" />
-                        Metodik qo'llanma (PDF)
+                      <Button size="lg" className="rounded-2xl h-14 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-black shadow-lg shadow-emerald-100 border-b-4 border-emerald-700 active:border-b-0 active:translate-y-1">
+                        <GraduationCap className="mr-3 w-6 h-6" />
+                        PDF Qo'llanma
                       </Button>
                     </div>
                   </div>

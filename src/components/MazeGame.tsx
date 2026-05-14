@@ -5,26 +5,33 @@ import { Trophy, Mic, MicOff, Volume2, Gamepad2, Star, PartyPopper, CheckCircle2
 import { Badge } from "@/components/ui/badge";
 import { launchSuccessResult } from "../lib/effects";
 
-const CHALLENGE_WORDS = [
-  // Oson (Easy) - Basic difficult sounds
-  { word: "Randa", difficulty: "Oson", prompt: "Rrr-randa" },
-  { word: "Lola", difficulty: "Oson", prompt: "Lll-lola" },
-  { word: "Shar", difficulty: "Oson", prompt: "Shsh-shar" },
-  { word: "Quyon", difficulty: "Oson", prompt: "Qq-quyon" },
-  // O'rtacha (Medium) - More complex pronunciation
-  { word: "Sabzi", difficulty: "O'rtacha", prompt: "Sss-sabzi" },
-  { word: "Robot", difficulty: "O'rtacha", prompt: "Rrr-robot" },
-  { word: "Limon", difficulty: "O'rtacha", prompt: "Lll-limon" },
-  { word: "Shaftoli", difficulty: "O'rtacha", prompt: "Shsh-shaftoli" },
-  // Murakkab (Hard) - Multi-syllable and tricky sounds
-  { word: "Raketa", difficulty: "Murakkab", prompt: "Rrr-raketa" },
-  { word: "Shashka", difficulty: "Murakkab", prompt: "Shsh-shashka" },
-  { word: "Chirildoq", difficulty: "Murakkab", prompt: "Chch-chirildoq" },
-  { word: "Qulupnay", difficulty: "Murakkab", prompt: "Qq-qulupnay" }
-];
+const CHALLENGE_WORDS = {
+  1: [ // Oson (Easy) - Basic sounds
+    { word: "Olma", difficulty: "Oson", prompt: "O-l-m-a" },
+    { word: "Bola", difficulty: "Oson", prompt: "B-o-l-a" },
+    { word: "Kuchuk", difficulty: "Oson", prompt: "K-u-ch-u-k" },
+    { word: "Archa", difficulty: "Oson", prompt: "A-r-ch-a" },
+    { word: "Ona", difficulty: "Oson", prompt: "O-n-a" },
+  ],
+  2: [ // O'rtacha (Medium) - R sound and consonant clusters
+    { word: "Robot", difficulty: "O'rtacha", prompt: "Rrr-robot" },
+    { word: "Shaftoli", difficulty: "O'rtacha", prompt: "Shsh-shaftoli" },
+    { word: "Kaptar", difficulty: "O'rtacha", prompt: "Kk-kaptar" },
+    { word: "Qaychi", difficulty: "O'rtacha", prompt: "Qq-qaychi" },
+    { word: "Traktor", difficulty: "O'rtacha", prompt: "Trr-raktor" },
+  ],
+  3: [ // Murakkab (Hard) - Multi-syllable and very tricky sounds
+    { word: "Raketa", difficulty: "Murakkab", prompt: "Rrr-raketa" },
+    { word: "Karkidon", difficulty: "Murakkab", prompt: "Krr-karkidon" },
+    { word: "Shashlik", difficulty: "Murakkab", prompt: "Shsh-shashlik" },
+    { word: "O'zbekiston", difficulty: "Murakkab", prompt: "O'z-bekiston" },
+    { word: "Piramida", difficulty: "Murakkab", prompt: "Pii-ramida" },
+  ]
+};
 
-const MAZE_LENGTH = 3000; // Longer maze
-const STEP_SIZE = 4; // Faster base speed for longer maze
+const MAX_LEVELS = 3;
+const MAZE_LENGTH = 3000; 
+const BASE_STEP_SIZE = 4;
 
 // Character Component with National Clothing
 const UzbekBoyCharacter = ({ isMoving }: { isMoving: boolean }) => {
@@ -114,6 +121,7 @@ const UzbekBoyCharacter = ({ isMoving }: { isMoving: boolean }) => {
 };
 
 export function MazeGame() {
+  const [level, setLevel] = useState(1);
   const [position, setPosition] = useState(0);
   const [isMoving, setIsMoving] = useState(false);
   const [isChallenge, setIsChallenge] = useState(false);
@@ -133,10 +141,17 @@ export function MazeGame() {
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    // Generate obstacles - spaced out over 3000 pixels
-    const obs = [400, 800, 1200, 1600, 2000, 2400, 2800];
+    // Generate obstacles - density increases with level
+    const count = 4 + level; // Level 1: 5, Level 2: 6, Level 3: 7
+    const obs = [];
+    const step = MAZE_LENGTH / (count + 1);
+    for (let i = 1; i <= count; i++) {
+        obs.push(Math.round(i * step));
+    }
     setObstacles(obs);
+  }, [level]);
 
+  useEffect(() => {
     // Audio setup
     audioRef.current = new Audio("https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3"); // Upbeat
     audioRef.current.loop = true;
@@ -205,9 +220,10 @@ export function MazeGame() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isMoving && gameState === "playing" && !isChallenge) {
+      const stepSize = BASE_STEP_SIZE + (level - 1); // Get faster as level increases
       interval = setInterval(() => {
         setPosition(prev => {
-          const next = prev + STEP_SIZE;
+          const next = prev + stepSize;
           
           // Check for obstacles
           const obstacleAt = obstacles.find(obs => next >= obs && !passedObstacles.has(obs));
@@ -231,10 +247,8 @@ export function MazeGame() {
   }, [isMoving, gameState, isChallenge, obstacles, passedObstacles]);
 
   const triggerChallenge = (obstacle: number) => {
-    // Select word based on obstacle position (difficulty curve)
-    const section = Math.floor((obstacle / MAZE_LENGTH) * 3);
-    const difficulty = section === 0 ? "Oson" : section === 1 ? "O'rtacha" : "Murakkab";
-    const availableWords = CHALLENGE_WORDS.filter(w => w.difficulty === difficulty);
+    // Select word based on CURRENT LEVEL
+    const availableWords = CHALLENGE_WORDS[level as keyof typeof CHALLENGE_WORDS];
     const randomWord = availableWords[Math.floor(Math.random() * availableWords.length)];
     
     setCurrentChallenge(randomWord);
@@ -297,6 +311,7 @@ export function MazeGame() {
   };
 
   const startGame = () => {
+    setLevel(1);
     setPosition(0);
     setScore(0);
     setPassedObstacles(new Set());
@@ -328,7 +343,22 @@ export function MazeGame() {
     window.speechSynthesis.speak(utterance);
   };
 
+  const startNextLevel = () => {
+    if (level < MAX_LEVELS) {
+      setLevel(prev => prev + 1);
+      setPosition(0);
+      setPassedObstacles(new Set());
+      setGameState("playing");
+      setIsMoving(true);
+      launchSuccessResult();
+    } else {
+      setGameState("ready");
+      setLevel(1);
+    }
+  };
+
   if (gameState === "finished") {
+    const isGameComplete = level >= MAX_LEVELS;
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center space-y-6">
         <motion.div
@@ -336,15 +366,25 @@ export function MazeGame() {
           animate={{ scale: 1, rotate: 0 }}
           className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-lg"
         >
-          <Trophy className="w-12 h-12 text-white" />
+          {isGameComplete ? <PartyPopper className="w-12 h-12 text-white" /> : <Trophy className="w-12 h-12 text-white" />}
         </motion.div>
-        <h3 className="text-3xl font-bold">Marra!</h3>
+        <h3 className="text-3xl font-bold">{isGameComplete ? "Tabriklaymiz!" : `${level}-bosqich yakunlandi!`}</h3>
         <p className="text-muted-foreground text-lg">
-          Siz labirintdan muvaffaqiyatli o'tdingiz va {score} ball to'pladingiz!
+          {isGameComplete 
+            ? `Siz barcha bosqichlarni a'lo darajada o'tdingiz va ${score} ball to'pladingiz!` 
+            : `Siz bu bosqichni muvaffaqiyatli yakunladingiz! Keyingi bosqich yanada qiziqarli bo'ladi.`}
         </p>
-        <Button onClick={startGame} size="lg" className="rounded-full px-10 bg-green-600 hover:bg-green-700">
-          Qayta urinish
-        </Button>
+        <div className="flex flex-col gap-3">
+            {!isGameComplete ? (
+                <Button onClick={startNextLevel} size="lg" className="rounded-full px-12 h-16 text-xl bg-blue-600 hover:bg-blue-700 shadow-xl border-b-4 border-blue-800">
+                    Keyingi bosqich! 🚀
+                </Button>
+            ) : (
+                <Button onClick={startGame} size="lg" className="rounded-full px-10 bg-green-600 hover:bg-green-700">
+                    Boshidan boshlash
+                </Button>
+            )}
+        </div>
       </div>
     );
   }
@@ -370,9 +410,14 @@ export function MazeGame() {
     <div className="w-full flex flex-col items-center gap-12 py-8 px-4 relative">
       {/* HUD */}
       <div className="w-full flex justify-between items-center max-w-2xl">
-        <Badge variant="outline" className="text-lg py-1 px-4">
-          Masofa: {Math.round((position / MAZE_LENGTH) * 100)}%
-        </Badge>
+        <div className="flex gap-2">
+            <Badge variant="outline" className="text-lg py-1 px-4 bg-white">
+            Bosqich: {level}/{MAX_LEVELS}
+            </Badge>
+            <Badge variant="outline" className="text-lg py-1 px-4">
+            Masofa: {Math.round((position / MAZE_LENGTH) * 100)}%
+            </Badge>
+        </div>
         <div className="flex items-center gap-2 text-green-600 font-bold text-2xl relative">
           <Star className="fill-current w-6 h-6" />
           {score}
