@@ -12,6 +12,8 @@ const LIFT_COEFFICIENT = 0.1;
 const MAX_VELOCITY = 4;
 const GAME_BG_MUSIC_URL = "https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f6946.mp3";
 
+const PRACTICE_SOUNDS = ["Rrr", "Lll", "Sss", "Shsh", "Zzz", "Ggg", "Kkk", "Ppp", "Ttt"];
+
 export function VoiceControlledGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bgMusicRef = useRef<HTMLAudioElement>(null);
@@ -25,6 +27,7 @@ export function VoiceControlledGame() {
   const [showFlash, setShowFlash] = useState(false);
   const [lives, setLives] = useState(3);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const [targetSound, setTargetSound] = useState(PRACTICE_SOUNDS[0]); 
   const containerRef = useRef<HTMLDivElement>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -129,6 +132,7 @@ export function VoiceControlledGame() {
       speed: MIN_SPEED,
     };
     setScore(0);
+    setTargetSound(PRACTICE_SOUNDS[0]);
     setLives(3);
     setWarningMessage(null);
     setGameOver(false);
@@ -289,6 +293,10 @@ export function VoiceControlledGame() {
         o.passed = true;
         if (gameState.current.obstacles.indexOf(o) % 2 === 0) {
           setScore(s => s + 1);
+          setTargetSound(prev => {
+            const nextIdx = (PRACTICE_SOUNDS.indexOf(prev) + 1) % PRACTICE_SOUNDS.length;
+            return PRACTICE_SOUNDS[nextIdx];
+          });
           const audioClone = successAudioRef.current?.cloneNode(true) as HTMLAudioElement;
           if (audioClone) {
             audioClone.play().catch(() => {});
@@ -526,7 +534,8 @@ export function VoiceControlledGame() {
             <div className="space-y-2">
               <h3 className="text-4xl font-black text-slate-800 font-display">Ovozli Parvoz 🚀</h3>
               <p className="text-slate-500 text-lg font-medium leading-relaxed">
-                Qahramonimizni ovozingiz bilan boshqaring! <br/>
+                <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-xl text-2xl font-black mr-2">"{targetSound}"</span> 
+                tovushini aytib to'siqlardan o'ting! <br/>
                 <span className="text-blue-600 font-black">Baland ovoz = Yuqoriga ko'tarilish!</span>
               </p>
             </div>
@@ -644,15 +653,34 @@ export function VoiceControlledGame() {
                 </div>
               </div>
 
-              {/* Bottom Volume Indicator */}
-              <div className="absolute bottom-6 left-6 right-6 flex flex-col items-center gap-3">
+              {/* Bottom Volume Indicator & Target Letter */}
+              <div className="absolute bottom-6 left-6 right-6 flex flex-col items-center gap-4">
                 {!isManualMode && (
-                   <div className="w-full max-w-xs h-3 bg-black/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/20">
-                        <motion.div 
-                            animate={{ width: `${Math.min(gameState.current.volume, 100)}%` }}
-                            className={`h-full transition-colors duration-300 ${gameState.current.volume > gameState.current.sensitivity ? 'bg-emerald-400 shadow-[0_0_10px_#34d399]' : 'bg-blue-400'}`}
-                        />
+                   <div className="flex flex-col items-center gap-2 w-full">
+                      <motion.div 
+                        animate={{ 
+                          scale: gameState.current.volume > gameState.current.sensitivity ? 1.2 : 1,
+                          color: gameState.current.volume > gameState.current.sensitivity ? "#7c3aed" : "#94a3b8"
+                        }}
+                        className="text-6xl md:text-8xl font-black font-display drop-shadow-sm select-none"
+                      >
+                         {targetSound}
+                      </motion.div>
+                      <div className="w-full max-w-xs h-3 bg-black/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/20">
+                          <motion.div 
+                              animate={{ width: `${Math.min(gameState.current.volume, 100)}%` }}
+                              className={`h-full transition-colors duration-300 ${gameState.current.volume > gameState.current.sensitivity ? 'bg-purple-500 shadow-[0_0_15px_#a855f7]' : 'bg-blue-400'}`}
+                          />
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                        {gameState.current.volume > gameState.current.sensitivity ? "A'lo!" : "Tovush chiqaring..."}
+                      </p>
                    </div>
+                )}
+                {isManualMode && (
+                  <div className="text-4xl font-black text-slate-300 opacity-50">
+                    {targetSound}
+                  </div>
                 )}
               </div>
 

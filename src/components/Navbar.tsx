@@ -12,7 +12,7 @@ export function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     { id: "diagnostics", label: "Tashxis", icon: Stethoscope },
     { id: "exercises", label: "Mashqlar", icon: BookOpen },
     { id: "games", label: "O'yinlar", icon: Gamepad2 },
-    { id: "textbook", label: "Darslik", icon: GraduationCap },
+    { id: "textbook", label: "Elektron Kutubxona", icon: GraduationCap },
     { id: "resources", label: "Ma'lumotlar", icon: User },
   ];
 
@@ -20,8 +20,8 @@ export function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-t-2 border-slate-100 md:top-4 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:w-max md:rounded-3xl md:border-2 md:sticker-shadow md:px-4">
       <div className="container flex items-center justify-around h-18 px-4 mx-auto md:gap-4 md:px-2">
         <div className="hidden md:flex items-center gap-3 font-display font-black text-2xl pr-4 border-r border-slate-100">
-          <div className="w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-white rotate-[-5deg] shadow-lg">N</div>
-          <span className="bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">Nutq Nur</span>
+          <div className="w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-white rotate-[-5deg] shadow-lg">R</div>
+          <span className="bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">Ravon Nutq</span>
         </div>
         <div className="flex items-center gap-1 md:gap-3 py-2">
           {navItems.map((item) => (

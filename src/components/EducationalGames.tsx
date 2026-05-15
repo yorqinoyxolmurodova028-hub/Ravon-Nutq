@@ -82,13 +82,13 @@ const games = [
   {
     id: 6,
     title: "Hikoya Tuzuvchi",
-    description: "Rasm asosida o'z hikoyangizni yarating. Bog'langan nutq va tasavvurni rivojlantiradi.",
+    description: "O'zbek xalq ertaklari asosida o'z hikoyangizni yarating. Bog'langan nutq va tasavvurni rivojlantiradi.",
     category: "Nutq",
     difficulty: "Oson",
     icon: BookOpen,
     color: "bg-pink-500",
-    image: "https://images.unsplash.com/photo-1512820666243-e5949ff8302c?q=80&w=400&auto=format&fit=crop",
-    instruction: "Ekranda rasm paydo bo'ladi. Unga diqqat bilan qarang va nimalar bo'layotgani haqida qiziqarli hikoya so'zlab bering. 'Keyingi rasm' tugmasini bosib yangi sarguzashtlarni boshlang!",
+    image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=400&auto=format&fit=crop",
+    instruction: "Ekranda o'zbek xalq ertaklaridan lavhalar paydo bo'ladi. Unga diqqat bilan qarang va qiziqarli hikoya so'zlab bering. 'Keyingi rasm' tugmasini bosib yangi ertaklar olamiga sho'ng'ing!",
     component: StoryCreatorGame,
   },
 ];

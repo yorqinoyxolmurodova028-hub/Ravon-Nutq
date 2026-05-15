@@ -18,70 +18,46 @@ const STORY_PROMPTS: StoryPrompt[] = [
     description: "Afsonaviy Semurg' qushi uzoq o'lkalardan qanday xushxabar keltirdi?"
   },
   {
-    id: "fox-and-wolf",
-    url: "https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&w=2000&auto=format&fit=crop",
-    title: "Ayyor Tulki sarguzashti",
-    description: "Tulki va bo'ri bu gal qanday qiziqarli reja tuzishmoqda?"
-  },
-  {
-    id: "bear-honey",
-    url: "https://images.unsplash.com/photo-1589656966115-37330761e0bb?q=80&w=2000&auto=format&fit=crop",
-    title: "Mehribon Ayiqcha",
-    description: "Ayiqcha o'rmon do'stlari uchun asal yig'ib keldi. U kimlarni mehmonga chaqiradi?"
-  },
-  {
-    id: "lion-friends",
-    url: "https://images.unsplash.com/photo-1614027164847-1b2809eb189d?q=80&w=2000&auto=format&fit=crop",
-    title: "Aqlli Sher va Do'stlari",
-    description: "O'rmonlar qiroli sher va uning do'stlari nima haqida suhbatlashayotganini so'zlab bering."
-  },
-  {
-    id: "rabbit-adventure",
-    url: "https://images.unsplash.com/photo-1591154665855-51faad52b36e?q=80&w=2000&auto=format&fit=crop",
-    title: "Jasur Quyoncha",
-    description: "Bu mitti quyoncha savatchaga nimalarni yig'di va qayerga ketmoqda?"
-  },
-  {
-    id: "magical-palace",
-    url: "https://images.unsplash.com/photo-1529973625058-a665431328fb?q=80&w=2000&auto=format&fit=crop",
-    title: "Sehrli Oltin Qasr",
-    description: "Bu go'zal qasrda qaysi malika yoki shahzoda yashaydi?"
-  },
-  {
-    id: "squirrel-party",
-    url: "https://images.unsplash.com/photo-1507358522600-9f71e620c44e?q=80&w=2000&auto=format&fit=crop",
-    title: "Olmaxonning Bayrami",
-    description: "Olmaxon o'zining barcha do'stlariga qish uchun yong'oqlar ulashmoqda."
-  },
-  {
-    id: "talking-fish",
-    url: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=2000&auto=format&fit=crop",
-    title: "Gapiradigan Oltin Baliq",
-    description: "Agar siz oltin baliqni tutib olsangiz, undan qanday uchta tilak so'ragan bo'lardingiz?"
-  },
-  {
-    id: "owl-wisdom",
-    url: "https://images.unsplash.com/photo-1543549732-234b4e7fe70d?q=80&w=2000&auto=format&fit=crop",
-    title: "Bilimdon Boyo'g'li",
-    description: "Tunda hamma uxlaganda boyo'g'li qanday sirlarni ko'rishi mumkin?"
-  },
-  {
-    id: "fairytale-village",
+    id: "zumrad-qimmat",
     url: "https://images.unsplash.com/photo-1510001857259-6943984b9acd?q=80&w=2000&auto=format&fit=crop",
-    title: "Ertaklar Shaharchasi",
-    description: "Bu mitti uychalarda qanday gnomlar yoki parilar yashashi haqida hikoya qiling."
+    title: "Zumrad va Qimmat",
+    description: "Zumrad kampirning uyiga borib, qanday yaxshiliklar qildi? Qimmat-chi?"
   },
   {
-    id: "kitten-curiosity",
-    url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2000&auto=format&fit=crop",
-    title: "Qiziquvchan Mushukcha",
-    description: "Mushukcha bog'da nimalarni qidirib yuribdi? U qanday yangi do'stlar orttiradi?"
+    id: "ur-toqmoq",
+    url: "https://images.unsplash.com/photo-1596753177708-30177732a35d?q=80&w=2000&auto=format&fit=crop",
+    title: "Ur, To'qmoq!",
+    description: "Sehrli to'qmoq bechora cholni qanday qilib boyvachchaning zulmidan qutqardi?"
   },
   {
-    id: "ocean-palace",
-    url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=2000&auto=format&fit=crop",
-    title: "Dengiz Qirolligi",
-    description: "Suv ostidagi rang-barang baliqlar va delfinlar qanday o'yinlar o'ynashadi?"
+    id: "oltin-tarvuz",
+    url: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?q=80&w=2000&auto=format&fit=crop",
+    title: "Oltin Tarvuz",
+    description: "Yaxshi cholning tarvuzi ichidan nima uchun tilla tangalar chiqdi?"
+  },
+  {
+    id: "susambil",
+    url: "https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&w=2000&auto=format&fit=crop",
+    title: "Susambilga Sayohat",
+    description: "Xo'roz, eshak va buqa Susambilga borishda qanday sarguzashtlarni boshdan kechirishdi?"
+  },
+  {
+    id: "egri-togri",
+    url: "https://images.unsplash.com/photo-1533230393619-3c78822bc961?q=80&w=2000&auto=format&fit=crop",
+    title: "Egri va To'g'ri",
+    description: "To'g'ri o'z halolligi bilan qanday qilib baxtga erishdi?"
+  },
+  {
+    id: "sehrli-gilam",
+    url: "https://images.unsplash.com/photo-1529973625058-a665431328fb?q=80&w=2000&auto=format&fit=crop",
+    title: "Sehrli Gilam",
+    description: "Sehrli gilamda uchib, qanday qadimiy shaharlarni ko'rish mumkin?"
+  },
+  {
+    id: "tanti-boyvachcha",
+    url: "https://images.unsplash.com/photo-1543549732-234b4e7fe70d?q=80&w=2000&auto=format&fit=crop",
+    title: "Tanti Boyvachcha",
+    description: "Boyvachcha o'zining saxovatliligi bilan qanday qilib mashhur bo'ldi?"
   }
 ];
 

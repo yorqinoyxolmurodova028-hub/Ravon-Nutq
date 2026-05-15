@@ -13,7 +13,7 @@ import {
 
 const lessonModules = [
   {
-    grade: "1-sinf",
+    grade: "R tovushini mustahkamlash 1- darslik",
     subject: "Ona tili va o'qish savodxonligi",
     topic: "Unli va undosh tovushlar",
     textbookLink: "https://docs.google.com/document/d/1zQjnkz8xyWIu44dVY4i3EVnpKiFK26pF/edit?usp=drive_link&ouid=104463674687201252083&rtpof=true&sd=true",
@@ -21,7 +21,7 @@ const lessonModules = [
     methods: [
       {
         name: "Ovozlarni topish o'yini",
-        steps: "Darslikdagi so'zlarni aytishda boladan muayyan tovushni (masalan 'R' yoki 'S') balandroq aytishini so'rang.",
+        steps: "Kitobdagi so'zlarni aytishda boladan muayyan tovushni (masalan 'R' yoki 'S') balandroq aytishini so'rang.",
         interactive: "Rasm ostidagi so'zda tovush o'rnini (boshi, o'rtasi, oxiri) aniqlash."
       },
       {
@@ -32,7 +32,7 @@ const lessonModules = [
     ]
   },
   {
-    grade: "2-sinf",
+    grade: "R tovushini mustahkamlash 2- darslik",
     subject: "Ona tili",
     topic: "So'z turkumlari (Ot, Sifat, Fe'l)",
     textbookLink: "https://docs.google.com/document/d/15R7vctWzAIQwiuNUzMxXghMn9WWPTZpf/edit?usp=drive_link&ouid=104463674687201252083&rtpof=true&sd=true",
@@ -40,7 +40,7 @@ const lessonModules = [
     methods: [
       {
         name: "Sifatlar zanjiri",
-        steps: "Darslikdagi rasmlarga sifatlar tanlash orqali unli tovushlar cho'ziqligini mashq qilish.",
+        steps: "Kitobdagi rasmlarga sifatlar tanlash orqali unli tovushlar cho'ziqligini mashq qilish.",
         interactive: "So'zlarni tempga moslab, ritm bilan aytish."
       },
       {
@@ -51,15 +51,15 @@ const lessonModules = [
     ]
   },
   {
-    grade: "3-sinf",
+    grade: "Q tovushini mustahkamlash",
     subject: "Ona tili",
     topic: "Gap turlari va tinish belgilari",
-    textbookLink: "#",
+    textbookLink: "https://docs.google.com/document/d/1ZJ8E_g5_TW3okVlFWWsi57ZwyRWvRvL-/edit?usp=drive_link&ouid=104463674687201252083&rtpof=true&sd=true",
     correctionGoal: "Prosodika (intonatsiya, urg'u, tembr) ustida ishlash",
     methods: [
       {
         name: "Intonatsiya teatri",
-        steps: "Darslikdagi matnni turli hissiyotlar (shodlik, hayrat, so'roq) bilan o'qish.",
+        steps: "Kitobdagi matnni turli hissiyotlar (shodlik, hayrat, so'roq) bilan o'qish.",
         interactive: "Tinish belgilariga qarab ovoz balandligini o'zgartirish."
       },
       {
@@ -70,10 +70,10 @@ const lessonModules = [
     ]
   },
   {
-    grade: "4-sinf",
+    grade: "L tovushini mustahkamlash",
     subject: "Ona tili",
     topic: "Matn yaratish va bayonlar",
-    textbookLink: "#",
+    textbookLink: "https://docs.google.com/document/d/1zDFw7mmbcN1Kw6y69UlNBbDrDg4HCe_L/edit?usp=drive_link&ouid=104463674687201252083&rtpof=true&sd=true",
     correctionGoal: "Bog'lanishli nutqni rivojlantirish va duduqlanishni oldini olish",
     methods: [
       {
@@ -85,6 +85,44 @@ const lessonModules = [
         name: "Mind Mapping (Aqliy xarita)",
         steps: "Insho mavzusiga oid so'zlarni artikulyatsiyasiga ko'ra guruhlash.",
         interactive: "Murakkab so'zlarni logopedik tahlil qilib, so'ngra matnga kiritish."
+      }
+    ]
+  },
+  {
+    grade: "K tovushi talaffuzini mustahkamlash",
+    subject: "Badiiy adabiyot",
+    topic: "Nutq o'stirish va lug'at boyligi",
+    textbookLink: "https://docs.google.com/document/d/1YyF5byb36DigWJklkZeQlc1tTD6eATy1/edit?usp=drive_link&ouid=104463674687201252083&rtpof=true&sd=true",
+    correctionGoal: "Tahliliy fikrlash, tasavvurni boyitish va izchil nutqni shakllantirish",
+    methods: [
+      {
+        name: "Ertakni qayta hikoyalash",
+        steps: "Bolaga ertakni o'qib berganingizdan so'ng, voqealar ketma-ketligini so'rang.",
+        interactive: "Ertak qahramonlarining nutqini turli ovozlarda taqlid qilib ko'rsating."
+      },
+      {
+        name: "Yangi so'zlar xazinasi",
+        steps: "Ertakdagi notanish so'zlarni ajratib, ularning ma'nosini tushuntiring.",
+        interactive: "Ushbu so'zlar ishtirokida yangi kichik gaplar tuzing."
+      }
+    ]
+  },
+  {
+    grade: "Logopedik qo'llanma (Yangi)",
+    subject: "Nutq terapiyasi",
+    topic: "Nutqiy rivojlanish va artikulyatsiya",
+    textbookLink: "https://drive.google.com/file/d/1Aant3EBTftSwcjJemiur0w-zrXpDmaRh/view?usp=drive_link",
+    correctionGoal: "Nutq nuqsonlarini kompleks bartaraf etish va talaffuzni shakllantirish",
+    methods: [
+      {
+        name: "Artikulyatsion mashqlar majmuasi",
+        steps: "Qo'llanmadagi ko'rsatmalarga binoan har bir tovush uchun maxsus mashqlarni bajaring.",
+        interactive: "Oyna qarshisida til va lab mashqlarini vizual nazorat ostida o'tkazish."
+      },
+      {
+        name: "Tovushlar kombinatsiyasi",
+        steps: "Murakkab bo'g'inli so'zlarni sekin va aniq talaffuz qilish mashqlari.",
+        interactive: "So'zlarni bo'g'inlarga ajratib, ritm ostida aytish."
       }
     ]
   }
@@ -102,16 +140,16 @@ export function TextbookIntegration() {
           <Layout className="w-12 h-12" />
         </motion.div>
         <h2 className="text-5xl md:text-6xl font-black font-display text-slate-900 mb-4 bg-gradient-to-r from-emerald-500 to-sky-500 bg-clip-text text-transparent">
-          Darslik bilan Integratsiya 📖
+          Elektron Kutubxona 📖
         </h2>
         <p className="text-2xl text-slate-500 font-medium max-w-3xl">
-          Maktab darsliklarini o'qish endi yanada qiziqarli! 
-          Keling, Ona tili darslarini o'yinlar bilan birga o'rganamiz.
+          Elektron kutubxonamiz darsliklari bilan o'qish endi yanada qiziqarli! 
+          Keling, Ona tili kitoblarini o'yinlar bilan birga o'rganamiz.
         </p>
       </div>
 
       <div className="grid gap-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {lessonModules.map((module, idx) => (
             <Card 
               key={idx} 
@@ -129,8 +167,8 @@ export function TextbookIntegration() {
                 <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-600 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-inner">
                   <GraduationCap className="w-10 h-10" />
                 </div>
-                <CardTitle className="text-3xl font-black font-display text-slate-800">{module.grade}</CardTitle>
-                <CardDescription className="text-base font-bold text-emerald-500 mt-2">Darsliklar to'plami</CardDescription>
+                <CardTitle className="text-xl md:text-2xl font-black font-display text-slate-800 leading-tight">{module.grade}</CardTitle>
+                <CardDescription className="text-base font-bold text-emerald-500 mt-2">Kutubxona to'plami</CardDescription>
               </CardHeader>
             </Card>
           ))}
@@ -204,7 +242,7 @@ export function TextbookIntegration() {
                         }}
                       >
                         <BookOpen className="mr-3 w-6 h-6" />
-                        Darslikni ko'rish
+                        Kitobni ko'rish
                       </Button>
                       <Button size="lg" className="rounded-2xl h-14 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-black shadow-lg shadow-emerald-100 border-b-4 border-emerald-700 active:border-b-0 active:translate-y-1">
                         <GraduationCap className="mr-3 w-6 h-6" />
