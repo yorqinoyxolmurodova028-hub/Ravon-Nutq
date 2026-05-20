@@ -264,7 +264,7 @@ export function TextbookIntegration() {
             <div>
               <h4 className="text-2xl font-bold mb-2">Ustozlar uchun eslatma</h4>
               <p className="text-muted-foreground leading-relaxed">
-                Ushbu metodikalar Ona tili darsliklarining amaldagi o'quv rejasi bilan to'liq integratsiya qilingan. 
+                Ushbu metodikalar yordamida ona tili darslari bilan mashg'ulotlarni integratsiya qilishingiz mumkin. 
                 Siz darsni o'tish jarayonida nutqida nuqsoni bor o'quvchilar bilan individual ishlash uchun ushbu 
                 korreksion elementlardan foydalanishingiz mumkin.
               </p>
