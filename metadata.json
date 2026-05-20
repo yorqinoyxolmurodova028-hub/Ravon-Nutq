@@ -5,6 +5,7 @@
     "microphone"
   ],
   "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API",
     "AI-powered speech analysis",
     "Interactive diagnostic tests",
     "Corrective exercise library"
