@@ -6,32 +6,68 @@ import { Badge } from "@/components/ui/badge";
 import { launchSuccessResult } from "../lib/effects";
 
 const CHALLENGE_WORDS = {
-  1: [ // Oson (Easy) - Basic sounds
-    { word: "Olma", difficulty: "Oson", prompt: "O-l-m-a" },
-    { word: "Bola", difficulty: "Oson", prompt: "B-o-l-a" },
-    { word: "Kuchuk", difficulty: "Oson", prompt: "K-u-ch-u-k" },
-    { word: "Archa", difficulty: "Oson", prompt: "A-r-ch-a" },
-    { word: "Ona", difficulty: "Oson", prompt: "O-n-a" },
+  1: [ // Oson (Easy) but targeted logopedic sounds - short words
+    { word: "G'ildirak", difficulty: "Oson", prompt: "G'il-di-rak", description: "[G'] va [R] tovushlarini talaffuz qilish" },
+    { word: "Qurbaqa", difficulty: "Oson", prompt: "Qur-ba-qa", description: "[Q] va [R] tovushlari mashqi" },
+    { word: "Shashlik", difficulty: "Oson", prompt: "Shash-lik", description: "[Sh] va [L] tovushlarini farqlash" },
+    { word: "Traktor", difficulty: "Oson", prompt: "Trak-tor", description: "[Tr] murakkab tovushlar birikmasi" },
+    { word: "Qaychi", difficulty: "Oson", prompt: "Qay-chi", description: "[Q] va [Ch] tovushlari mashqi" },
   ],
-  2: [ // O'rtacha (Medium) - R sound and consonant clusters
-    { word: "Robot", difficulty: "O'rtacha", prompt: "Rrr-robot" },
-    { word: "Shaftoli", difficulty: "O'rtacha", prompt: "Shsh-shaftoli" },
-    { word: "Kaptar", difficulty: "O'rtacha", prompt: "Kk-kaptar" },
-    { word: "Qaychi", difficulty: "O'rtacha", prompt: "Qq-qaychi" },
-    { word: "Traktor", difficulty: "O'rtacha", prompt: "Trr-raktor" },
+  2: [ // O'rtacha (Medium) - Shorter words with tricky combinations
+    { word: "Chumchuq", difficulty: "O'rtacha", prompt: "Chum-chuq", description: "[Ch] va [Q] tovushlarini takrorlash" },
+    { word: "Sinchalak", difficulty: "O'rtacha", prompt: "Sin-cha-lak", description: "[S], [Ch] va [L] tovushlar birikmasi" },
+    { word: "G'alvir", difficulty: "O'rtacha", prompt: "G'al-vir", description: "[G'], [L] va [R] tovushlari uyg'unligi" },
+    { word: "Sarg'aldoq", difficulty: "O'rtacha", prompt: "Sar-g'al-doq", description: "[R], [G'] va [L] tovushlari ketma-ketligi" },
+    { word: "Qorabuloq", difficulty: "O'rtacha", prompt: "Qo-ra-bu-loq", description: "[Q], [R] va [L] tovushlari farqlanishi" },
   ],
-  3: [ // Murakkab (Hard) - Multi-syllable and very tricky sounds
-    { word: "Raketa", difficulty: "Murakkab", prompt: "Rrr-raketa" },
-    { word: "Karkidon", difficulty: "Murakkab", prompt: "Krr-karkidon" },
-    { word: "Shashlik", difficulty: "Murakkab", prompt: "Shsh-shashlik" },
-    { word: "O'zbekiston", difficulty: "Murakkab", prompt: "O'z-bekiston" },
-    { word: "Piramida", difficulty: "Murakkab", prompt: "Pii-ramida" },
+  3: [ // Murakkab (Hard) - Shorter but highly challenging tongue-twister words
+    { word: "Karkidon", difficulty: "Murakkab", prompt: "Kar-ki-don", description: "[R] tovushini takroriy talaffuz qilish" },
+    { word: "Zarg'aldoq", difficulty: "Murakkab", prompt: "Zar-g'al-doq", description: "[Z], [R], [G'] va [L] qiyin uyg'unligi" },
+    { word: "Qaltirash", difficulty: "Murakkab", prompt: "Qal-ti-rash", description: "[Q], [L], [R] va [Sh] tovushlari mashqi" },
+    { word: "Sug'orish", difficulty: "Murakkab", prompt: "Su-g'o-rish", description: "[S], [G'], [R] va [Sh] qiyin tovushlari" },
+    { word: "Toshbaqa", difficulty: "Murakkab", prompt: "Tosh-ba-qa", description: "[Sh] va [Q] tovushlari birikmasi" },
   ]
 };
 
 const MAX_LEVELS = 3;
 const MAZE_LENGTH = 3000; 
 const BASE_STEP_SIZE = 4;
+
+interface PathPoint {
+  progress: number; // 0 to 1
+  x: number; // percentage of width (0 to 100)
+  y: number; // percentage of height (0 to 100)
+}
+
+const MAZE_PATH: PathPoint[] = [
+  { progress: 0, x: 8, y: 70 },
+  { progress: 0.12, x: 22, y: 70 },
+  { progress: 0.25, x: 22, y: 30 }, // Winding Up
+  { progress: 0.38, x: 42, y: 30 }, // Winding Right
+  { progress: 0.50, x: 42, y: 74 }, // Winding Down
+  { progress: 0.62, x: 62, y: 74 }, // Winding Right
+  { progress: 0.75, x: 62, y: 30 }, // Winding Up
+  { progress: 0.88, x: 80, y: 30 }, // Winding Right
+  { progress: 0.94, x: 80, y: 64 }, // Winding Down
+  { progress: 1.0, x: 92, y: 64 },  // Winding to Finish
+];
+
+const getCoordinatesForProgress = (progress: number): { x: number; y: number } => {
+  if (progress <= 0) return { x: MAZE_PATH[0].x, y: MAZE_PATH[0].y };
+  if (progress >= 1) return { x: MAZE_PATH[MAZE_PATH.length - 1].x, y: MAZE_PATH[MAZE_PATH.length - 1].y };
+
+  for (let i = 0; i < MAZE_PATH.length - 1; i++) {
+    const pStart = MAZE_PATH[i].progress;
+    const pEnd = MAZE_PATH[i + 1].progress;
+    if (progress >= pStart && progress <= pEnd) {
+      const segmentProgress = (progress - pStart) / (pEnd - pStart);
+      const x = MAZE_PATH[i].x + segmentProgress * (MAZE_PATH[i + 1].x - MAZE_PATH[i].x);
+      const y = MAZE_PATH[i].y + segmentProgress * (MAZE_PATH[i + 1].y - MAZE_PATH[i].y);
+      return { x, y };
+    }
+  }
+  return { x: 50, y: 50 };
+};
 
 // Character Component with National Clothing
 const UzbekBoyCharacter = ({ isMoving }: { isMoving: boolean }) => {
@@ -134,6 +170,8 @@ export function MazeGame() {
   const [showBonus, setShowBonus] = useState(false);
   const [obstacles, setObstacles] = useState<number[]>([]);
   const [passedObstacles, setPassedObstacles] = useState<Set<number>>(new Set());
+  const [obstacleWords, setObstacleWords] = useState<Record<number, any>>({});
+  const [isMergingKeys, setIsMergingKeys] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -145,10 +183,18 @@ export function MazeGame() {
     const count = 4 + level; // Level 1: 5, Level 2: 6, Level 3: 7
     const obs = [];
     const step = MAZE_LENGTH / (count + 1);
+    const wordsMap: Record<number, any> = {};
+    const availableWords = CHALLENGE_WORDS[level as keyof typeof CHALLENGE_WORDS] || CHALLENGE_WORDS[1];
+
     for (let i = 1; i <= count; i++) {
-        obs.push(Math.round(i * step));
+      const pos = Math.round(i * step);
+      obs.push(pos);
+      // Allocate specific word to this obstacle position
+      const wordIndex = (i - 1) % availableWords.length;
+      wordsMap[pos] = availableWords[wordIndex];
     }
     setObstacles(obs);
+    setObstacleWords(wordsMap);
   }, [level]);
 
   useEffect(() => {
@@ -217,6 +263,7 @@ export function MazeGame() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameState, isChallenge, currentChallenge]);
 
+  // Game Loop: Pure position updater (updates 100% of the movement)
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isMoving && gameState === "playing" && !isChallenge) {
@@ -224,19 +271,7 @@ export function MazeGame() {
       interval = setInterval(() => {
         setPosition(prev => {
           const next = prev + stepSize;
-          
-          // Check for obstacles
-          const obstacleAt = obstacles.find(obs => next >= obs && !passedObstacles.has(obs));
-          if (obstacleAt) {
-            setIsMoving(false);
-            triggerChallenge(obstacleAt);
-            return obstacleAt;
-          }
-
           if (next >= MAZE_LENGTH) {
-            setIsMoving(false);
-            setGameState("finished");
-            launchSuccessResult();
             return MAZE_LENGTH;
           }
           return next;
@@ -244,14 +279,34 @@ export function MazeGame() {
       }, 30);
     }
     return () => clearInterval(interval);
-  }, [isMoving, gameState, isChallenge, obstacles, passedObstacles]);
+  }, [isMoving, gameState, isChallenge, level]);
+
+  // Side-effect handler: Checks for obstacles and handles game finish safely outside position setters
+  useEffect(() => {
+    if (gameState !== "playing" || isChallenge) return;
+
+    // Check if character reached or exceeded the finish line
+    if (position >= MAZE_LENGTH) {
+      setIsMoving(false);
+      setGameState("finished");
+      launchSuccessResult();
+      return;
+    }
+
+    // Check if character reached or crossed any unpassed obstacles
+    const obstacleAt = obstacles.find(obs => position >= obs && !passedObstacles.has(obs));
+    if (obstacleAt) {
+      setPosition(obstacleAt); // Snap precisely to the obstacle's coordinate
+      setIsMoving(false);
+      triggerChallenge(obstacleAt);
+    }
+  }, [position, obstacles, passedObstacles, gameState, isChallenge]);
 
   const triggerChallenge = (obstacle: number) => {
-    // Select word based on CURRENT LEVEL
-    const availableWords = CHALLENGE_WORDS[level as keyof typeof CHALLENGE_WORDS];
-    const randomWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+    // Select word assigned specifically to this obstacle
+    const assignedWord = obstacleWords[obstacle] || CHALLENGE_WORDS[level as keyof typeof CHALLENGE_WORDS][0];
     
-    setCurrentChallenge(randomWord);
+    setCurrentChallenge(assignedWord);
     setAttempts(0);
     setIsChallenge(true);
     // Give a small delay before starting mic to let the user see the word
@@ -268,10 +323,23 @@ export function MazeGame() {
   };
 
   const handleAttempt = () => {
+    if (isMergingKeys) return; // Prevent double trigger
+
     setAttempts(prev => {
       const next = prev + 1;
       if (next >= 3) {
-        finishChallenge();
+        setIsMergingKeys(true);
+        // Stop listening immediately to avoid extra sounds or errors
+        if (recognitionRef.current) {
+          try {
+            recognitionRef.current.stop();
+          } catch (e) {}
+          setIsListening(false);
+        }
+        setTimeout(() => {
+          finishChallenge();
+          setIsMergingKeys(false);
+        }, 1800);
         return 3;
       }
       return next;
@@ -294,6 +362,7 @@ export function MazeGame() {
     setPassedObstacles(prev => new Set(prev).add(position));
     setScore(s => s + 50);
     setIsMoving(true);
+    setAttempts(0); // Reset attempts so HUD is empty for next segment
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
@@ -317,6 +386,7 @@ export function MazeGame() {
     setPassedObstacles(new Set());
     setGameState("playing");
     setIsMoving(true);
+    setAttempts(0); // Reset attempts
     audioRef.current?.play().catch(() => {});
   };
 
@@ -350,6 +420,7 @@ export function MazeGame() {
       setPassedObstacles(new Set());
       setGameState("playing");
       setIsMoving(true);
+      setAttempts(0); // Reset attempts
       launchSuccessResult();
     } else {
       setGameState("ready");
@@ -406,15 +477,20 @@ export function MazeGame() {
     );
   }
 
+  const coord = getCoordinatesForProgress(position / MAZE_LENGTH);
+  const pathD = MAZE_PATH.map((pt, index) => 
+    `${index === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`
+  ).join(' ');
+
   return (
     <div className="w-full flex flex-col items-center gap-12 py-8 px-4 relative">
       {/* HUD */}
       <div className="w-full flex justify-between items-center max-w-2xl">
         <div className="flex gap-2">
-            <Badge variant="outline" className="text-lg py-1 px-4 bg-white">
+            <Badge variant="outline" className="text-lg py-1 px-4 bg-white shadow-sm border-stone-200">
             Bosqich: {level}/{MAX_LEVELS}
             </Badge>
-            <Badge variant="outline" className="text-lg py-1 px-4">
+            <Badge variant="outline" className="text-lg py-1 px-4 shadow-sm border-stone-200">
             Masofa: {Math.round((position / MAZE_LENGTH) * 100)}%
             </Badge>
         </div>
@@ -435,77 +511,299 @@ export function MazeGame() {
         </div>
       </div>
 
-      {/* Path with Castle Theme */}
-      <div className="w-full max-w-3xl h-56 bg-stone-800 rounded-[3rem] relative overflow-hidden shadow-2xl border-b-8 border-stone-900 border-x-4 border-stone-700">
+      {/* Path with Castle Theme (Height increased to h-80 for 2D winding maze) */}
+      <div 
+        onClick={() => {
+          if (gameState === "playing" && !isChallenge) {
+            setIsMoving(prev => !prev);
+          }
+        }}
+        className={`w-full max-w-3xl h-80 bg-stone-900 rounded-[3rem] relative overflow-hidden shadow-2xl border-b-8 border-stone-950 border-x-4 border-stone-850 select-none transition-all
+          ${gameState === "playing" && !isChallenge ? "cursor-pointer active:brightness-95 hover:border-stone-800" : ""}`}
+      >
+        {/* Absolute Key Collection HUD inside the Maze Box itself */}
+        {gameState === "playing" && (
+          <div className="absolute top-4 left-4 z-40 bg-stone-950/85 backdrop-blur-md border border-amber-500/20 rounded-2xl px-3 py-1.5 flex flex-col items-start gap-1 shadow-2xl select-none pointer-events-none transition-all duration-300">
+            <span className="text-[9px] font-black text-amber-400 uppercase tracking-wider leading-none">
+              {!isMergingKeys ? `Kalitlar: ${attempts}/3` : "Birlashmoqda! ✨"}
+            </span>
+            <div className="relative flex items-center justify-start h-6 min-w-[70px]">
+              {!isMergingKeys ? (
+                <div className="flex gap-1.5">
+                  {[1, 2, 3].map(i => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={attempts >= i 
+                        ? { scale: [1, 1.25, 1], opacity: 1, rotate: [0, -10, 10, 0] } 
+                        : { scale: 1, opacity: 0.3 }
+                      }
+                      transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                      className={`w-6 h-6 rounded-lg border flex items-center justify-center relative transition-all duration-300
+                        ${attempts >= i 
+                          ? 'border-yellow-400 bg-gradient-to-br from-amber-400 to-yellow-300 text-stone-950 font-bold shadow-[0_0_8px_rgba(234,179,8,0.4)]' 
+                          : 'border-stone-700 bg-stone-850 text-stone-600'}`}
+                    >
+                      <span className={`text-xs ${attempts >= i ? '' : 'grayscale opacity-30'}`}>🔑</span>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                /* Merging Animation inside Maze Box HUD */
+                <div className="relative w-16 h-6 flex items-center justify-center overflow-visible">
+                  <motion.div
+                    initial={{ x: -15, scale: 1, opacity: 1 }}
+                    animate={{ x: 0, scale: 1.3, opacity: 0.8, rotate: 360 }}
+                    transition={{ duration: 0.8 }}
+                    className="absolute text-xs"
+                  >
+                    🔑
+                  </motion.div>
+                  <motion.div
+                    initial={{ x: 15, scale: 1, opacity: 1 }}
+                    animate={{ x: 0, scale: 1.3, opacity: 0.8, rotate: -360 }}
+                    transition={{ duration: 0.8 }}
+                    className="absolute text-xs"
+                  >
+                    🔑
+                  </motion.div>
+                  <motion.div
+                    initial={{ y: -10, scale: 1, opacity: 1 }}
+                    animate={{ y: 0, scale: 1.3, opacity: 0.8 }}
+                    transition={{ duration: 0.8 }}
+                    className="absolute text-xs"
+                  >
+                    🔑
+                  </motion.div>
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: [0, 1.5, 1.2], opacity: 1 }}
+                    transition={{ delay: 0.7, duration: 0.5 }}
+                    className="absolute text-sm z-20"
+                  >
+                    🔑
+                  </motion.div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Magical Key Fusion Overlay in the Center of the Maze Box */}
+        <AnimatePresence>
+          {isMergingKeys && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-stone-950/70 backdrop-blur-xs z-40 flex flex-col items-center justify-center pointer-events-none"
+            >
+              <div className="relative flex items-center justify-center w-36 h-36">
+                <motion.div 
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+                  className="absolute w-24 h-24 rounded-full border-4 border-dashed border-yellow-400/30"
+                />
+                <motion.div 
+                  animate={{ rotate: -360 }}
+                  transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                  className="absolute w-28 h-28 rounded-full border-2 border-dotted border-amber-500/20"
+                />
+
+                <motion.div
+                  initial={{ x: -60, scale: 1, opacity: 0 }}
+                  animate={{ x: 0, scale: 1.6, opacity: [0, 1, 1, 0.8], rotate: 360 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="absolute text-3xl"
+                >
+                  🔑
+                </motion.div>
+                <motion.div
+                  initial={{ x: 60, scale: 1, opacity: 0 }}
+                  animate={{ x: 0, scale: 1.6, opacity: [0, 1, 1, 0.8], rotate: -360 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="absolute text-3xl"
+                >
+                  🔑
+                </motion.div>
+                <motion.div
+                  initial={{ y: -50, scale: 1, opacity: 0 }}
+                  animate={{ y: 0, scale: 1.6, opacity: [0, 1, 1, 0.8] }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="absolute text-3xl"
+                >
+                  🔑
+                </motion.div>
+
+                <motion.div
+                  initial={{ scale: 0, opacity: 0, rotate: -45 }}
+                  animate={{ scale: [0, 2.2, 1.8], opacity: 1, rotate: [0, 15, 0] }}
+                  transition={{ delay: 0.7, duration: 0.6, type: "spring" }}
+                  className="absolute flex flex-col items-center z-20"
+                >
+                  <span className="text-5xl filter drop-shadow-[0_0_15px_rgba(250,204,21,0.7)]">🔑</span>
+                  <motion.span 
+                    animate={{ opacity: [0.6, 1, 0.6], scale: [0.95, 1.05, 0.95] }}
+                    transition={{ repeat: Infinity, duration: 0.8 }}
+                    className="text-[10px] font-black text-yellow-400 uppercase tracking-wider bg-stone-900 border border-yellow-500/50 px-2.5 py-0.5 rounded-full shadow-lg whitespace-nowrap mt-2 font-sans"
+                  >
+                    Eshik ochilmoqda! 🚪✨
+                  </motion.span>
+                </motion.div>
+
+                <motion.div
+                  initial={{ scale: 0.2, opacity: 0 }}
+                  animate={{ scale: [0.2, 3, 4], opacity: [0, 1, 0] }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                  className="absolute w-12 h-12 bg-yellow-400 rounded-full blur-2xl"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Wall Background */}
-        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_30%,#333,transparent),radial-gradient(circle_at_80%_70%,#222,transparent)]" />
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_20%_30%,#333,transparent),radial-gradient(circle_at_80%_70%,#222,transparent)]" />
         
-        {/* Torches */}
+        {/* Torches (Positioned higher up) */}
         {[10, 30, 50, 70, 90].map(x => (
-          <div key={`torch-${x}`} style={{ left: `${x}%` }} className="absolute top-10 flex flex-col items-center">
-             <div className="w-2 h-8 bg-amber-900 rounded-b-lg" />
+          <div key={`torch-${x}`} style={{ left: `${x}%` }} className="absolute top-4 flex flex-col items-center">
+             <div className="w-1.5 h-6 bg-amber-900 rounded-b-lg" />
              <motion.div 
                animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
                transition={{ repeat: Infinity, duration: 0.5 }}
-               className="w-4 h-4 bg-orange-500 rounded-full blur-sm mb-4" 
+               className="w-3 h-3 bg-orange-500 rounded-full blur-sm mb-4" 
              />
           </div>
         ))}
 
-        {/* Castle Windows (Arched) */}
+        {/* Castle Windows (Arched, positioned subtly in background) */}
         <div className="absolute inset-0 flex justify-around items-center opacity-10 pointer-events-none">
-           {Array.from({ length: 6 }).map((_, i) => (
-             <div key={i} className="w-16 h-28 bg-sky-200 rounded-t-full border-4 border-stone-600" />
+           {Array.from({ length: 5 }).map((_, i) => (
+             <div key={i} className="w-12 h-20 bg-sky-200 rounded-t-full border-4 border-stone-700" />
            ))}
         </div>
 
-        {/* Castle Floor (Stone blocks) */}
-        <div className="absolute bottom-4 left-0 right-10 h-20 bg-stone-700 rounded-full shadow-inner border-b-4 border-stone-800 flex items-center justify-center overflow-hidden">
-           <div className="w-[200%] h-full bg-[repeating-linear-gradient(90deg,#555,#555_2px,transparent_2px,transparent_100px)] opacity-20" />
-           <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,#444,#444_2px,transparent_2px,transparent_40px)] opacity-10" />
-        </div>
-        
-        {/* Destination Castle Entrance */}
-        <div className="absolute right-0 top-0 bottom-0 w-16 bg-stone-900 shadow-2xl flex items-center justify-center border-l-4 border-stone-600">
-           <div className="w-10 h-32 bg-stone-800 rounded-t-full border-2 border-stone-700" />
-        </div>
-        
-        {/* Obstacles Visual (Doors) */}
-        {obstacles.map(obs => (
-           <div 
-             key={obs}
-             style={{ left: `${(obs / MAZE_LENGTH) * 100}%` }}
-             className={`absolute bottom-4 h-24 w-12 transition-all z-20 flex flex-col items-center justify-end overflow-visible
-                ${passedObstacles.has(obs) ? 'opacity-20 scale-x-50 -translate-y-2' : ''}`}
-           >
-              {!passedObstacles.has(obs) ? (
-                <motion.div 
-                  layoutId={`door-${obs}`}
-                  className="w-12 h-20 bg-amber-900 rounded-t-xl border-4 border-amber-950 shadow-xl flex items-center justify-center relative"
-                >
-                   <div className="w-10 h-1 bg-amber-950/30 absolute top-4" />
-                   <div className="w-10 h-1 bg-amber-950/30 absolute top-10" />
-                   <div className="w-10 h-1 bg-amber-950/30 absolute bottom-4" />
-                   <div className="w-2 h-2 bg-yellow-500 rounded-full absolute right-2 top-1/2 -translate-y-1/2 shadow-inner" />
-                   <div className="absolute -top-10 text-2xl">🚪</div>
-                </motion.div>
-              ) : (
-                <div className="w-12 h-2 text-green-500 font-bold text-[10px] text-center mb-2">OCHIQ</div>
-              )}
-           </div>
-        ))}
+        {/* Winding Stone Road Path Vector Graphics */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {/* Path Shadows */}
+          <path
+            d={pathD}
+            fill="none"
+            stroke="#1c1917"
+            strokeWidth="16"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="opacity-70"
+          />
+          {/* Main cobblestone border */}
+          <path
+            d={pathD}
+            fill="none"
+            stroke="#78716c"
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Core road texture */}
+          <path
+            d={pathD}
+            fill="none"
+            stroke="#d6d3d1"
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="3 4"
+          />
+          {/* Inner pathway line */}
+          <path
+            d={pathD}
+            fill="none"
+            stroke="#e7e5e4"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="1 8"
+          />
+        </svg>
 
-        {/* Character */}
+        {/* Cute Castle Maze decorations along the curves */}
+        <div style={{ left: "12%", top: "45%" }} className="absolute text-xl pointer-events-none select-none opacity-80">🌳</div>
+        <div style={{ left: "30%", top: "52%" }} className="absolute text-lg pointer-events-none select-none opacity-70">🌸</div>
+        <div style={{ left: "50%", top: "45%" }} className="absolute text-xl pointer-events-none select-none opacity-80">🌳</div>
+        <div style={{ left: "70%", top: "54%" }} className="absolute text-lg pointer-events-none select-none opacity-70">🌻</div>
+        <div style={{ left: "86%", top: "40%" }} className="absolute text-xl pointer-events-none select-none opacity-80">🚩</div>
+
+        {/* Destination Finish Castle Archway */}
+        <div 
+          style={{ left: "92%", top: "64%", transform: "translate(-50%, -75%)" }} 
+          className="absolute z-10 flex flex-col items-center pointer-events-none"
+        >
+          <span className="text-2xl animate-bounce duration-1000">🏰</span>
+          <div className="w-10 h-14 bg-gradient-to-b from-stone-700 to-stone-850 rounded-t-full border-2 border-amber-500 shadow-xl flex items-center justify-center">
+            <span className="text-[9px] font-black text-amber-400 tracking-wider">MARRA</span>
+          </div>
+        </div>
+        
+        {/* Obstacles Visual (Doors positioned dynamically along the coordinates of the winding road) */}
+        {obstacles.map(obs => {
+           const obsCoord = getCoordinatesForProgress(obs / MAZE_LENGTH);
+           const isPassed = passedObstacles.has(obs);
+           const assignedWord = obstacleWords[obs];
+           return (
+             <div 
+               key={obs}
+               style={{ 
+                 left: `${obsCoord.x}%`, 
+                 top: `${obsCoord.y}%`,
+                 transform: "translate(-50%, -65%)"
+               }}
+               className={`absolute h-16 w-10 transition-all z-20 flex flex-col items-center justify-end overflow-visible
+                  ${isPassed ? 'opacity-20 scale-x-50 -translate-y-2' : ''}`}
+             >
+                {/* Word displayed directly above the locked door - ONLY SHOWS when the boy is actually standing at this door (isChallenge is active for this door) */}
+                {!isPassed && assignedWord && isChallenge && currentChallenge?.word === assignedWord.word && (
+                  <div className="absolute bottom-[105%] mb-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-1.5 rounded-xl whitespace-nowrap shadow-md border border-amber-300 select-none pointer-events-none text-center flex flex-col items-center min-w-[70px] animate-bounce z-30">
+                    <span className="text-[7px] text-amber-100 uppercase tracking-wider font-extrabold leading-none mb-0.5">Ayting:</span>
+                    <span className="leading-none drop-shadow-sm font-bold text-xs">{assignedWord.word}</span>
+                    {/* Small speech arrow pointing to the door */}
+                    <div className="w-1.5 h-1.5 bg-amber-600 rotate-45 absolute -bottom-0.5 left-1/2 -translate-x-1/2 border-r border-b border-amber-300" />
+                  </div>
+                )}
+
+                {!isPassed ? (
+                  <motion.div 
+                    layoutId={`door-${obs}`}
+                    className="w-10 h-14 bg-amber-950 rounded-t-lg border-2 border-amber-950 shadow-xl flex items-center justify-center relative"
+                  >
+                     <div className="w-8 h-0.5 bg-amber-900/40 absolute top-3" />
+                     <div className="w-8 h-0.5 bg-amber-900/40 absolute top-7" />
+                     <div className="w-8 h-0.5 bg-amber-900/40 absolute bottom-3" />
+                     <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full absolute right-1.5 top-1/2 -translate-y-1/2 shadow-inner animate-pulse" />
+                     <div className="absolute -top-7 text-lg">🚪</div>
+                  </motion.div>
+                ) : (
+                  <div className="w-12 h-2 text-green-400 font-extrabold text-[8px] text-center mb-1">OCHIQ</div>
+                )}
+             </div>
+           );
+        })}
+
+        {/* Character (Positioned on the 2D path coord) */}
         <motion.div
-           animate={{ x: (position / MAZE_LENGTH) * (containerRef.current ? containerRef.current.clientWidth - 80 : 500) }}
-           className="absolute bottom-6 left-0 z-30 transform flex items-center justify-center"
+           animate={{ 
+             left: `${coord.x}%`, 
+             top: `${coord.y}%` 
+           }}
+           transition={position <= 2 ? { duration: 0 } : { type: "tween", ease: "linear", duration: 0.05 }}
+           className="absolute z-30 transform -translate-x-1/2 -translate-y-[85%] flex items-center justify-center pointer-events-none"
         >
           <UzbekBoyCharacter isMoving={isMoving} />
           {isMoving && (
              <motion.div 
-               animate={{ x: [-5, -20], opacity: [0.6, 0] }}
-               transition={{ repeat: Infinity, duration: 0.3 }}
-               className="absolute -left-6 bottom-4 text-xs opacity-50"
+                animate={{ x: [-5, -20], opacity: [0.6, 0] }}
+                transition={{ repeat: Infinity, duration: 0.3 }}
+                className="absolute -left-6 bottom-4 text-xs opacity-50"
              >
                 💨
              </motion.div>
@@ -515,92 +813,93 @@ export function MazeGame() {
 
       <div ref={containerRef} className="w-full invisible h-0" />
 
-      {/* Challenge UI */}
-      <AnimatePresence>
-        {isChallenge && (
+      {/* Challenge UI - Ultra-Compact Horizontal Inline Panel below the Maze */}
+      <AnimatePresence mode="wait">
+        {isChallenge ? (
           <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-            className="w-full max-w-xl bg-white rounded-3xl p-8 shadow-2xl border-4 border-red-100 flex flex-col items-center gap-6 relative"
+            initial={{ height: 0, opacity: 0, y: 15 }}
+            animate={{ height: "auto", opacity: 1, y: 0 }}
+            exit={{ height: 0, opacity: 0, y: 15 }}
+            transition={{ type: "spring", stiffness: 120, damping: 18 }}
+            className="w-full max-w-3xl bg-white rounded-3xl p-4 sm:p-5 shadow-lg border-2 border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden"
           >
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow-lg flex items-center gap-2">
-               <ShieldAlert className="w-5 h-5" />
-               To'siq!
-            </div>
-
-            <div className="text-center space-y-4">
-              <Badge variant="secondary" className="mb-2">{currentChallenge.difficulty}</Badge>
-              <p className="text-muted-foreground font-medium uppercase tracking-widest text-sm">Ushbu so'zni 3 marta ayting:</p>
-              <h2 className="text-5xl font-black text-primary tracking-tighter">{currentChallenge.prompt}</h2>
-              <p className="text-xl font-bold text-blue-600 italic">"{currentChallenge.word}"</p>
-              <Button variant="ghost" size="sm" onClick={playWord} className="rounded-full text-blue-600">
-                <Volume2 className="w-4 h-4 mr-2" />
-                Eshitish
-              </Button>
-            </div>
-
-            {/* Attempts Indicator */}
-            <div className="flex gap-4">
-              {[1, 2, 3].map(i => (
-                <motion.div
-                  key={i}
-                  animate={attempts >= i ? { scale: [1, 1.2, 1], backgroundColor: "#22c55e" } : {}}
-                  className={`w-12 h-12 rounded-full border-4 flex items-center justify-center text-xl font-bold transition-colors
-                    ${attempts >= i ? 'border-green-600 bg-green-500 text-white' : 'border-slate-200 bg-slate-50 text-slate-300'}`}
-                >
-                  {attempts >= i ? <CheckCircle2 className="w-6 h-6" /> : i}
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="flex flex-col items-center gap-4 w-full">
-              <p className="text-xs text-muted-foreground italic text-center">
-                Maslahat: So'zni ayting yoki <span className="font-bold text-primary">Probel (Space)</span> tugmachasini bosing
-              </p>
+            {/* Left side: Word info */}
+            <div className="flex flex-col sm:items-start items-center text-center sm:text-left gap-1 flex-1">
+              <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+                <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full border-none uppercase">
+                  To'siq!
+                </Badge>
+                {currentChallenge.description && (
+                  <span className="text-[10px] bg-blue-50 text-blue-700 font-extrabold px-2 py-0.5 rounded-full border border-blue-100">
+                    🎯 {currentChallenge.description}
+                  </span>
+                )}
+                <Badge variant="secondary" className="bg-rose-50 text-rose-700 border border-rose-100 text-[9px] px-2 py-0.5 rounded-full uppercase font-bold">{currentChallenge.difficulty}</Badge>
+              </div>
               
-              {micError && (
-                <p className="text-xs text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 text-center">
-                   {micError}
+              <div className="flex items-baseline gap-2 mt-1 flex-wrap justify-center sm:justify-start">
+                <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight leading-none">
+                  {currentChallenge.prompt}
+                </h3>
+                <p className="text-base sm:text-lg font-black text-blue-500 italic leading-none">
+                  "{currentChallenge.word}"
                 </p>
-              )}
-              
-              {!isListening && !micError && (
-                 <p className="text-sm text-red-500 font-medium animate-pulse">Mikrofonni yoqing va gapiring!</p>
-              )}
-              
-              <div className="flex gap-4">
-                <Button 
-                   onClick={toggleMic} 
-                   size="lg" 
-                   className={`rounded-full h-16 w-16 p-0 shadow-lg ${isListening ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-slate-700'}`}
-                >
-                  {isListening ? <Mic className="w-8 h-8" /> : <MicOff className="w-8 h-8" />}
-                </Button>
-
-                {/* Fallback button for testing or if mic fails */}
-                <Button 
-                  onClick={handleAttempt} 
-                  variant="outline"
-                  className="rounded-full h-16 px-8 border-2 border-dashed border-primary/30"
-                >
-                  Aytib bo'ldim!
+                <Button variant="ghost" size="sm" onClick={playWord} className="h-7 w-7 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 p-0 ml-1">
+                  <Volume2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground italic text-center">
-              Eslatma: Nutq tahlili qilinmoqda. Har safar so'zni aniq talaffuz qiling.
-            </p>
+            {/* Right side: Microphone & Aytib bo'ldim button */}
+            <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center sm:justify-end">
+              <div className="flex flex-col items-end mr-1">
+                {micError ? (
+                  <p className="text-[10px] text-red-600 font-medium max-w-[160px] text-right leading-tight">
+                    {micError}
+                  </p>
+                ) : isListening ? (
+                  <span className="text-[10px] text-emerald-600 font-black animate-pulse uppercase tracking-wider">Gapiring... 🎤</span>
+                ) : (
+                  <span className="text-[10px] text-red-500 font-bold animate-pulse">Mikrofonni yoqing!</span>
+                )}
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <Button 
+                   onClick={toggleMic} 
+                   size="sm" 
+                   disabled={isMergingKeys}
+                   className={`rounded-2xl h-12 w-12 p-0 shadow-md transition-all duration-300 ${isListening ? 'bg-red-500 hover:bg-red-600 animate-pulse text-white' : 'bg-slate-700 hover:bg-slate-800 text-white'}`}
+                >
+                  {isListening ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+                </Button>
+
+                <Button 
+                  onClick={handleAttempt} 
+                  variant="default"
+                  size="default"
+                  disabled={isMergingKeys}
+                  className="rounded-2xl h-12 px-6 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 font-black text-white shadow-md text-sm border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 transition-all"
+                >
+                  Aytib bo'ldim! ✨
+                </Button>
+              </div>
+            </div>
           </motion.div>
+        ) : (
+          gameState === "playing" && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-2"
+            >
+              <p className="text-slate-500 font-bold text-sm">
+                Yo'lni davom ettirish uchun <span className="text-green-600 font-black">Ekrandagi Yo'lga</span> teging yoki bosing 🏃‍♂️💨
+              </p>
+            </motion.div>
+          )
         )}
       </AnimatePresence>
-
-      {!isChallenge && gameState === "playing" && (
-         <div className="text-center animate-bounce">
-            <p className="text-green-600 font-black text-xl uppercase tracking-tighter">Yugurmoqda...</p>
-         </div>
-      )}
     </div>
   );
 }

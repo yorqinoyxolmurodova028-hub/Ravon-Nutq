@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Trophy, Star, Play, Info, Mic, BookOpen } from "lucide-react";
+import { Gamepad2, Trophy, Star, Play, Info, Mic, BookOpen, Hourglass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import {
@@ -14,23 +14,10 @@ import {
 import { VoiceControlledGame } from "./VoiceControlledGame";
 import { WordBuilderGame } from "./WordBuilderGame";
 import { MoleGame } from "./MoleGame";
-import { SoundMatchGame } from "./SoundMatchGame";
 import { MazeGame } from "./MazeGame";
-import { StoryCreatorGame } from "./StoryCreatorGame";
+import { TezAytishGame } from "./TezAytishGame";
 
 const games = [
-  {
-    id: 1,
-    title: "Tovushlarni Top",
-    description: "Eshitilgan tovushga mos rasmni tanlang. Fonematik eshitishni rivojlantiradi.",
-    category: "Eshitish",
-    difficulty: "Oson",
-    icon: Gamepad2,
-    color: "bg-blue-500",
-    image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=400&auto=format&fit=crop",
-    instruction: "O'yin boshlanganda tovush yangraydi, siz esa ushbu tovush bilan boshlanadigan rasmni topishingiz kerak. Har bir to'g'ri javob uchun ballar to'plang!",
-    component: SoundMatchGame,
-  },
   {
     id: 5,
     title: "Ovozli Parvoz",
@@ -58,13 +45,13 @@ const games = [
   {
     id: 3,
     title: "Tezkor Qidiruv",
-    description: "Kvadratlar ichidan chiqadigan predmetlarni tezda bosing. Diqqat va reaksiyani rivojlantiradi.",
+    description: "Kvadratlar ichidan tezda chiqadigan murakkab harfli so'zlarni bosing. Diqqat va reaksiyani rivojlantiradi.",
     category: "Diqqat",
     difficulty: "Oson",
     icon: Trophy,
     color: "bg-orange-500",
     image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&auto=format&fit=crop",
-    instruction: "Kvadratlar ichidan tasvirlar chiqishini kuting va ularni tezda bosing! Har bir muvaffaqiyat +5 ball, o'tkazib yuborish esa -2 ball.",
+    instruction: "Kvadratlar ichidan talaffuzi murakkab harflar bilan boshlanadigan qisqa so'zlar (masalan: Rasm, Shakar, G'oz) chiqadi. Ularni tezda bosing! Bombani bosib yubormang!",
     component: MoleGame,
   },
   {
@@ -81,15 +68,15 @@ const games = [
   },
   {
     id: 6,
-    title: "Hikoya Tuzuvchi",
-    description: "O'zbek xalq ertaklari asosida o'z hikoyangizni yarating. Bog'langan nutq va tasavvurni rivojlantiradi.",
+    title: "Tez Aytishlar",
+    description: "Qumsoat oqib tugaguncha berilgan tez aytishni necha marta ayta olasiz? Tezkorlik va so'z boyligini sinab ko'ring!",
     category: "Nutq",
-    difficulty: "Oson",
-    icon: BookOpen,
-    color: "bg-pink-500",
-    image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=400&auto=format&fit=crop",
-    instruction: "Ekranda o'zbek xalq ertaklaridan lavhalar paydo bo'ladi. Unga diqqat bilan qarang va qiziqarli hikoya so'zlab bering. 'Keyingi rasm' tugmasini bosib yangi ertaklar olamiga sho'ng'ing!",
-    component: StoryCreatorGame,
+    difficulty: "O'rtacha",
+    icon: Hourglass,
+    color: "bg-amber-500",
+    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop",
+    instruction: "O'yin boshlanganda 1 daqiqalik qumsoat boshlanadi va til charxlovchi ajoyib tez aytish ko'rsatiladi. Baland ovozda adashmasdan tez aytishni aytganingizdan keyin 'Aytildi ✔️' tugmasini bosing. Vaqt oxirida siz aytgan marta soni bo'yicha ajoyib baho va ko'ngilochar rag'batlantiruvchi so'zlar (Qoniqarli, Yaxshi, Juda zo'r!) paydo bo'ladi!",
+    component: TezAytishGame,
   },
 ];
 
@@ -237,15 +224,25 @@ export function EducationalGames() {
               </div>
               <div className="flex items-center gap-2">
                 {isPlaying && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setIsPlaying(false)} 
-                    className="text-slate-400 hover:text-slate-900 font-bold hover:bg-slate-100 rounded-xl"
-                  >
-                    <Info className="w-5 h-5 mr-2" />
-                    Yo'riqnoma
-                  </Button>
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsPlaying(false)} 
+                      className="text-slate-500 hover:text-slate-900 font-bold hover:bg-slate-100 rounded-xl"
+                    >
+                      <Info className="w-5 h-5 mr-2" />
+                      Yo'riqnoma
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setIsDialogOpen(false)} 
+                      className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 font-bold"
+                    >
+                      Yopish
+                    </Button>
+                  </>
                 )}
               </div>
             </DialogHeader>
@@ -322,15 +319,15 @@ export function EducationalGames() {
               )}
             </div>
 
-            <div className={`px-8 py-6 border-t bg-card flex justify-center md:justify-end gap-6 shrink-0 ${isPlaying ? 'bg-background' : ''}`}>
-              <Button 
-                variant="outline" 
-                onClick={() => setIsDialogOpen(false)} 
-                className="rounded-2xl px-8 h-14 text-lg font-black text-slate-500 hover:bg-slate-50 border-2 border-slate-100"
-              >
-                Yopish
-              </Button>
-              {!isPlaying && (
+            {!isPlaying && (
+              <div className="px-8 py-6 border-t bg-card flex justify-center md:justify-end gap-6 shrink-0">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)} 
+                  className="rounded-2xl px-8 h-14 text-lg font-black text-slate-500 hover:bg-slate-50 border-2 border-slate-100"
+                >
+                  Yopish
+                </Button>
                 <Button 
                   disabled={!selectedGame?.component} 
                   onClick={() => setIsPlaying(true)}
@@ -339,8 +336,8 @@ export function EducationalGames() {
                   <Play className="w-5 h-5 mr-3 fill-current" />
                   Boshlash
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
