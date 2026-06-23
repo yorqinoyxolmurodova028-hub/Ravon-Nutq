@@ -66,11 +66,16 @@ const parentAdvice = [
 ];
 
 const experts = [
-  { name: "Sirojiddin Olimov", location: "Toshkent sh., Yunusobod tumani", contact: "+998 90 123 45 67", specialty: "Duduqlanish bo'yicha mutaxassis" },
-  { name: "Muborak Azizova", location: "Samarqand sh., Markaz", contact: "+998 93 765 43 21", specialty: "Dizartriya va logopedik uqalash" },
-  { name: "Dilshod Karimov", location: "Farg'ona sh., Kirguli", contact: "+998 91 111 22 33", specialty: "Bolalar nutqini o'stirish" },
-  { name: "Zuhra Rahmonova", location: "Buxoro sh., G'ijduvon ko'chasi", contact: "+998 99 444 55 66", specialty: "Rinolaliya va afaziya" },
-  { name: "Akmal Mansurov", location: "Namangan sh., Chorsu", contact: "+998 97 888 77 99", specialty: "Talaffuz nuqsonlarini tuzatish" },
+  { name: "Nargiza Umarova", region: "Sirdaryo", location: "Guliston sh., Markaziy shifoxona", contact: "+998 99 321 09 87", specialty: "Dislaliya va bolalar nutqini rivojlantirish" },
+  { name: "Sanjarbek Pardayev", region: "Sirdaryo", location: "Yangiyer sh., Ma'rifat ko'chasi", contact: "+998 90 543 21 09", specialty: "Duduqlanish (logonevroz) va darslar" },
+  { name: "Feruza Ahmedova", region: "Sirdaryo", location: "Sirdaryo t., Baxt shahri, Shifokorlar ko'chasi", contact: "+998 91 987 65 43", specialty: "Dizartriya, afaziya va logopedik uqalash" },
+  { name: "Olimjon To'rayev", region: "Sirdaryo", location: "Boyovut t., 3-sonli oilaviy poliklinika", contact: "+998 97 124 56 78", specialty: "Rinolaliya va korreksion pedagogika" },
+  { name: "Malika Qodirova", region: "Sirdaryo", location: "Xovos t., Bunyodkor ko'chasi, 12-uy", contact: "+998 94 876 54 32", specialty: "Kognitiv rivojlantirish va tovushlarni korreksiya qilish" },
+  { name: "Sirojiddin Olimov", region: "Boshqa", location: "Toshkent sh., Yunusobod tumani", contact: "+998 90 123 45 67", specialty: "Duduqlanish bo'yicha mutaxassis" },
+  { name: "Muborak Azizova", region: "Boshqa", location: "Samarqand sh., Markaz", contact: "+998 93 765 43 21", specialty: "Dizartriya va logopedik uqalash" },
+  { name: "Dilshod Karimov", region: "Boshqa", location: "Farg'ona sh., Kirguli", contact: "+998 91 111 22 33", specialty: "Bolalar nutqini o'stirish" },
+  { name: "Zuhra Rahmonova", region: "Boshqa", location: "Buxoro sh., G'ijduvon ko'chasi", contact: "+998 99 444 55 66", specialty: "Rinolaliya va afaziya" },
+  { name: "Akmal Mansurov", region: "Boshqa", location: "Namangan sh., Chorsu", contact: "+998 97 888 77 99", specialty: "Talaffuz nuqsonlarini tuzatish" },
 ];
 
 const teacherAdvice = [
@@ -121,6 +126,7 @@ const logopedicDictionary = [
 
 export function Resources() {
   const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<"Sirdaryo" | "Boshqa" | "All">("Sirdaryo");
 
   return (
     <section className="py-12 px-4 max-w-5xl mx-auto pb-40">
@@ -307,30 +313,81 @@ export function Resources() {
               Mutaxassislar bilan muloqot
             </DialogTitle>
             <DialogDescription>
-              Respublikamizdagi tajribali logopedlar va defektologlar ro'yxati.
+              Respublikamizdagi tajribali logopedlar va defektologlar ro'yxati. Sirdaryo viloyati bo'yicha saralangan.
             </DialogDescription>
           </DialogHeader>
+
+          {/* Region Tabs */}
+          <div className="px-6 py-3 bg-orange-50/40 border-b border-orange-100/50 flex gap-2 shrink-0">
+            <Button
+              variant={selectedRegion === "Sirdaryo" ? "default" : "outline"}
+              onClick={() => setSelectedRegion("Sirdaryo")}
+              className={`flex-1 rounded-2xl font-extrabold h-11 text-base shadow-sm ${
+                selectedRegion === "Sirdaryo"
+                  ? "bg-orange-600 hover:bg-orange-700 text-white"
+                  : "bg-white text-orange-800 border-orange-200 hover:bg-orange-50"
+              }`}
+            >
+              Sirdaryo viloyati ✨
+            </Button>
+            <Button
+              variant={selectedRegion === "Boshqa" ? "default" : "outline"}
+              onClick={() => setSelectedRegion("Boshqa")}
+              className={`flex-1 rounded-2xl font-extrabold h-11 text-base shadow-sm ${
+                selectedRegion === "Boshqa"
+                  ? "bg-orange-600 hover:bg-orange-700 text-white"
+                  : "bg-white text-orange-800 border-orange-200 hover:bg-orange-50"
+              }`}
+            >
+              Boshqa hududlar
+            </Button>
+            <Button
+              variant={selectedRegion === "All" ? "default" : "outline"}
+              onClick={() => setSelectedRegion("All")}
+              className={`flex-1 rounded-2xl font-extrabold h-11 text-base shadow-sm ${
+                selectedRegion === "All"
+                  ? "bg-orange-600 hover:bg-orange-700 text-white"
+                  : "bg-white text-orange-800 border-orange-200 hover:bg-orange-50"
+              }`}
+            >
+              Barchasi
+            </Button>
+          </div>
           
           <div className="flex-1 overflow-y-auto">
             <div className="p-6 pt-4 grid gap-4 pb-20">
-              {experts.map((exp, index) => (
-                <div key={index} className="p-6 rounded-3xl bg-orange-50/20 border border-orange-200/50 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm hover:bg-orange-50/50 transition-all">
-                  <div>
-                    <h4 className="font-bold text-2xl text-orange-800 mb-1">{exp.name}</h4>
-                    <p className="text-orange-600 font-semibold text-lg mb-2">{exp.specialty}</p>
-                    <div className="space-y-1">
-                      <p className="text-muted-foreground flex items-center gap-2 text-base">
-                        <span className="font-bold text-orange-950/70">Manzil:</span> {exp.location}
-                      </p>
+              {experts
+                .filter(exp => selectedRegion === "All" || exp.region === selectedRegion)
+                .map((exp, index) => (
+                  <div key={index} className="p-6 rounded-3xl bg-orange-50/20 border border-orange-200/50 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm hover:bg-orange-50/50 transition-all">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-bold text-2xl text-orange-800">{exp.name}</h4>
+                        {exp.region === "Sirdaryo" && (
+                          <span className="bg-orange-100 text-orange-700 font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-full tracking-wider border border-orange-200">
+                            Sirdaryo
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-orange-600 font-semibold text-lg mb-2">{exp.specialty}</p>
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground flex items-center gap-2 text-base">
+                          <span className="font-bold text-orange-950/70">Manzil:</span> {exp.location}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="shrink-0">
+                      <Button variant="default" className="bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl px-6 py-6 h-auto text-lg shadow-lg shadow-orange-200">
+                        {exp.contact}
+                      </Button>
                     </div>
                   </div>
-                  <div className="shrink-0">
-                    <Button variant="default" className="bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl px-6 py-6 h-auto text-lg shadow-lg shadow-orange-200">
-                      {exp.contact}
-                    </Button>
-                  </div>
+                ))}
+              {experts.filter(exp => selectedRegion === "All" || exp.region === selectedRegion).length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  Bu hududda mutaxassislar topilmadi.
                 </div>
-              ))}
+              )}
               <div className="mt-6 p-6 bg-orange-50 border border-orange-100 rounded-2xl text-center">
                 <p className="text-base text-muted-foreground italic font-medium">
                   Eslatma: Bog'lanishdan oldin mutaxassisning qabul vaqtlarini aniqlashtirish tavsiya etiladi.
