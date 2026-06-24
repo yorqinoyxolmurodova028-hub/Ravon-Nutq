@@ -614,7 +614,7 @@ export function VoiceControlledGame() {
             key="game"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="relative w-full h-full min-h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white bg-sky-200 sticker-shadow touch-none"
+            className="relative w-full h-full min-h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white bg-sky-200 sticker-shadow touch-pan-y"
           >
             <canvas 
               ref={canvasRef} 

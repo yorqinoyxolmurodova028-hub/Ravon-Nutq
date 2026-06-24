@@ -247,7 +247,7 @@ export function EducationalGames() {
               </div>
             </DialogHeader>
             
-            <div className={`relative flex-1 flex flex-col items-center justify-center ${isPlaying ? 'overflow-y-auto overflow-x-hidden p-4 bg-orange-50/30' : 'p-8 overflow-y-auto'}`}>
+            <div className={`relative flex-1 flex flex-col items-center ${isPlaying ? 'overflow-y-auto overflow-x-hidden p-4 bg-orange-50/30 justify-start' : 'p-8 overflow-y-auto justify-center'}`}>
               {!isPlaying ? (
                 <div className="flex flex-col gap-10 w-full max-w-4xl">
                   <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-muted group sticker-shadow">
@@ -313,7 +313,7 @@ export function EducationalGames() {
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center">
+                <div className="w-full min-h-fit my-auto flex flex-col items-center justify-start">
                   {selectedGame?.component && <selectedGame.component />}
                 </div>
               )}
