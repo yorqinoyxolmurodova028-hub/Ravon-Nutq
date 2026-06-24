@@ -165,7 +165,8 @@ export function MazeGame() {
   const [attempts, setAttempts] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
-  const [gameState, setGameState] = useState<"ready" | "playing" | "finished">("ready");
+  const [gameState, setGameState] = useState<"ready" | "playing" | "finished" | "failed">("ready");
+  const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState(0);
   const [showBonus, setShowBonus] = useState(false);
   const [obstacles, setObstacles] = useState<number[]>([]);
@@ -281,6 +282,32 @@ export function MazeGame() {
     return () => clearInterval(interval);
   }, [isMoving, gameState, isChallenge, level]);
 
+  // Avtomatik harakatni doimiy ravishda ta'minlash (bolakay to'xtab qolmasligi uchun)
+  useEffect(() => {
+    if (gameState === "playing" && !isChallenge && !isMergingKeys && !isMoving) {
+      setIsMoving(true);
+    }
+  }, [gameState, isChallenge, isMergingKeys, isMoving]);
+
+  // 30 soniyalik vaqt hisoblagichi (Timer)
+  useEffect(() => {
+    let timerInterval: NodeJS.Timeout;
+    if (gameState === "playing") {
+      timerInterval = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerInterval);
+            setIsMoving(false);
+            setGameState("failed");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerInterval);
+  }, [gameState]);
+
   // Side-effect handler: Checks for obstacles and handles game finish safely outside position setters
   useEffect(() => {
     if (gameState !== "playing" || isChallenge) return;
@@ -327,7 +354,7 @@ export function MazeGame() {
 
     setAttempts(prev => {
       const next = prev + 1;
-      if (next >= 3) {
+      if (next >= 1) {
         setIsMergingKeys(true);
         // Stop listening immediately to avoid extra sounds or errors
         if (recognitionRef.current) {
@@ -339,8 +366,8 @@ export function MazeGame() {
         setTimeout(() => {
           finishChallenge();
           setIsMergingKeys(false);
-        }, 1800);
-        return 3;
+        }, 1000);
+        return 1;
       }
       return next;
     });
@@ -359,7 +386,17 @@ export function MazeGame() {
 
   const finishChallenge = () => {
     setIsChallenge(false);
-    setPassedObstacles(prev => new Set(prev).add(position));
+    // Add both the current exact position AND some extra margin so we don't double trigger
+    setPassedObstacles(prev => {
+      const next = new Set(prev);
+      next.add(position);
+      // Also add the potential next snaps to prevent any re-triggering issues
+      next.add(position + 4);
+      next.add(position + 8);
+      next.add(position + 12);
+      return next;
+    });
+    setPosition(prev => Math.min(prev + 20, MAZE_LENGTH));
     setScore(s => s + 50);
     setIsMoving(true);
     setAttempts(0); // Reset attempts so HUD is empty for next segment
@@ -383,6 +420,7 @@ export function MazeGame() {
     setLevel(1);
     setPosition(0);
     setScore(0);
+    setTimeLeft(60);
     setPassedObstacles(new Set());
     setGameState("playing");
     setIsMoving(true);
@@ -417,6 +455,7 @@ export function MazeGame() {
     if (level < MAX_LEVELS) {
       setLevel(prev => prev + 1);
       setPosition(0);
+      setTimeLeft(60);
       setPassedObstacles(new Set());
       setGameState("playing");
       setIsMoving(true);
@@ -460,6 +499,27 @@ export function MazeGame() {
     );
   }
 
+  if (gameState === "failed") {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center space-y-6">
+        <motion.div
+          initial={{ scale: 0, rotate: -45 }}
+          animate={{ scale: 1, rotate: 0 }}
+          className="w-24 h-24 bg-rose-500 rounded-full flex items-center justify-center shadow-lg"
+        >
+          <ShieldAlert className="w-12 h-12 text-white" />
+        </motion.div>
+        <h3 className="text-3xl font-bold">Vaqt tugadi! ⏰</h3>
+        <p className="text-muted-foreground text-lg max-w-sm">
+          Afsuski, 1 daqiqa ichida marraga yetib kela olmadingiz. Qaytadan urinib ko'ramizmi?
+        </p>
+        <Button onClick={startGame} size="lg" className="rounded-full px-10 h-14 text-lg bg-emerald-600 hover:bg-emerald-700 shadow-xl">
+          Qaytadan boshlash 🔄
+        </Button>
+      </div>
+    );
+  }
+
   if (gameState === "ready") {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center space-y-6">
@@ -468,7 +528,7 @@ export function MazeGame() {
         </div>
         <h3 className="text-3xl font-bold">Logopedik Labirint</h3>
         <p className="text-muted-foreground text-lg max-w-sm">
-          Qahramonimizga marraga yetishga yordam bering! To'siqlarda berilgan so'zlarni 3 marta baland va aniq ayting.
+          Qahramonimizga marraga yetishga yordam bering! To'siqlarda berilgan so'zlarni baland va aniq ayting.
         </p>
         <Button onClick={startGame} size="lg" className="rounded-full px-10 h-14 text-lg bg-green-600 hover:bg-green-700">
           Yo'lga tushish!
@@ -486,12 +546,22 @@ export function MazeGame() {
     <div className="w-full flex flex-col items-center gap-12 py-8 px-4 relative">
       {/* HUD */}
       <div className="w-full flex justify-between items-center max-w-2xl">
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
             <Badge variant="outline" className="text-lg py-1 px-4 bg-white shadow-sm border-stone-200">
             Bosqich: {level}/{MAX_LEVELS}
             </Badge>
             <Badge variant="outline" className="text-lg py-1 px-4 shadow-sm border-stone-200">
             Masofa: {Math.round((position / MAZE_LENGTH) * 100)}%
+            </Badge>
+            <Badge 
+              variant="outline" 
+              className={`text-lg py-1 px-4 shadow-sm border-stone-200 transition-all duration-300 ${
+                timeLeft < 10 
+                  ? "bg-red-50 text-red-600 border-red-200 font-bold animate-pulse" 
+                  : "bg-white text-stone-700"
+              }`}
+            >
+              ⏰ {timeLeft}s
             </Badge>
         </div>
         <div className="flex items-center gap-2 text-green-600 font-bold text-2xl relative">
@@ -511,26 +581,59 @@ export function MazeGame() {
         </div>
       </div>
 
+      {/* Katta va juda ko'rinarli Taymer Bar */}
+      {gameState === "playing" && (
+        <div className="w-full max-w-3xl -mt-6 -mb-6 bg-stone-50 border border-stone-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-bold text-stone-600 uppercase tracking-widest flex items-center gap-2">
+              ⏰ Qolgan vaqt:
+            </span>
+            <span className={`text-2xl font-black tracking-tight px-3 py-1 rounded-xl transition-all duration-300 ${
+              timeLeft < 10 
+                ? 'text-red-600 bg-red-100 border border-red-200 animate-pulse' 
+                : 'text-emerald-700 bg-emerald-50 border border-emerald-100'
+            }`}>
+              {timeLeft} soniya
+            </span>
+          </div>
+          <div className="w-full h-4 bg-stone-200 rounded-full overflow-hidden shadow-inner border border-stone-300/30">
+            <motion.div 
+              initial={{ width: "100%" }}
+              animate={{ width: `${(timeLeft / 60) * 100}%` }}
+              transition={{ duration: 0.3, ease: "linear" }}
+              className={`h-full rounded-full ${timeLeft < 10 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'bg-gradient-to-r from-emerald-500 to-emerald-600'}`}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Path with Castle Theme (Height increased to h-80 for 2D winding maze) */}
       <div 
         onClick={() => {
           if (gameState === "playing" && !isChallenge) {
-            setIsMoving(prev => !prev);
+            // Bolaning harakati to'xtab qolmasligi uchun unga har doim isMoving=true beriladi va qo'shimcha tezlik qo'shiladi!
+            setIsMoving(true);
+            // Qahramonni tezroq oldinga suramiz (to'siqdan oshib ketmaydi, chunki side-effect datchigi uni to'xtatadi)
+            setPosition(prev => Math.min(prev + 60, MAZE_LENGTH));
+            // Kichik bonus ball beramiz va yulduzcha chiqaramiz
+            setScore(s => s + 2);
+            setShowBonus(true);
+            setTimeout(() => setShowBonus(false), 500);
           }
         }}
         className={`w-full max-w-3xl h-80 bg-stone-900 rounded-[3rem] relative overflow-hidden shadow-2xl border-b-8 border-stone-950 border-x-4 border-stone-850 select-none transition-all
-          ${gameState === "playing" && !isChallenge ? "cursor-pointer active:brightness-95 hover:border-stone-800" : ""}`}
+          ${gameState === "playing" && !isChallenge ? "cursor-pointer active:brightness-95 hover:bg-stone-850" : ""}`}
       >
         {/* Absolute Key Collection HUD inside the Maze Box itself */}
         {gameState === "playing" && (
           <div className="absolute top-4 left-4 z-40 bg-stone-950/85 backdrop-blur-md border border-amber-500/20 rounded-2xl px-3 py-1.5 flex flex-col items-start gap-1 shadow-2xl select-none pointer-events-none transition-all duration-300">
             <span className="text-[9px] font-black text-amber-400 uppercase tracking-wider leading-none">
-              {!isMergingKeys ? `Kalitlar: ${attempts}/3` : "Birlashmoqda! ✨"}
+              {!isMergingKeys ? `Kalitlar: ${attempts}/1` : "Eshik ochilmoqda! ✨"}
             </span>
             <div className="relative flex items-center justify-start h-6 min-w-[70px]">
               {!isMergingKeys ? (
                 <div className="flex gap-1.5">
-                  {[1, 2, 3].map(i => (
+                  {[1].map(i => (
                     <motion.div
                       key={i}
                       initial={{ scale: 0.8, opacity: 0 }}
@@ -552,33 +655,9 @@ export function MazeGame() {
                 /* Merging Animation inside Maze Box HUD */
                 <div className="relative w-16 h-6 flex items-center justify-center overflow-visible">
                   <motion.div
-                    initial={{ x: -15, scale: 1, opacity: 1 }}
-                    animate={{ x: 0, scale: 1.3, opacity: 0.8, rotate: 360 }}
-                    transition={{ duration: 0.8 }}
-                    className="absolute text-xs"
-                  >
-                    🔑
-                  </motion.div>
-                  <motion.div
-                    initial={{ x: 15, scale: 1, opacity: 1 }}
-                    animate={{ x: 0, scale: 1.3, opacity: 0.8, rotate: -360 }}
-                    transition={{ duration: 0.8 }}
-                    className="absolute text-xs"
-                  >
-                    🔑
-                  </motion.div>
-                  <motion.div
-                    initial={{ y: -10, scale: 1, opacity: 1 }}
-                    animate={{ y: 0, scale: 1.3, opacity: 0.8 }}
-                    transition={{ duration: 0.8 }}
-                    className="absolute text-xs"
-                  >
-                    🔑
-                  </motion.div>
-                  <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: [0, 1.5, 1.2], opacity: 1 }}
-                    transition={{ delay: 0.7, duration: 0.5 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
                     className="absolute text-sm z-20"
                   >
                     🔑
@@ -611,34 +690,9 @@ export function MazeGame() {
                 />
 
                 <motion.div
-                  initial={{ x: -60, scale: 1, opacity: 0 }}
-                  animate={{ x: 0, scale: 1.6, opacity: [0, 1, 1, 0.8], rotate: 360 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                  className="absolute text-3xl"
-                >
-                  🔑
-                </motion.div>
-                <motion.div
-                  initial={{ x: 60, scale: 1, opacity: 0 }}
-                  animate={{ x: 0, scale: 1.6, opacity: [0, 1, 1, 0.8], rotate: -360 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                  className="absolute text-3xl"
-                >
-                  🔑
-                </motion.div>
-                <motion.div
-                  initial={{ y: -50, scale: 1, opacity: 0 }}
-                  animate={{ y: 0, scale: 1.6, opacity: [0, 1, 1, 0.8] }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                  className="absolute text-3xl"
-                >
-                  🔑
-                </motion.div>
-
-                <motion.div
                   initial={{ scale: 0, opacity: 0, rotate: -45 }}
                   animate={{ scale: [0, 2.2, 1.8], opacity: 1, rotate: [0, 15, 0] }}
-                  transition={{ delay: 0.7, duration: 0.6, type: "spring" }}
+                  transition={{ delay: 0.1, duration: 0.6, type: "spring" }}
                   className="absolute flex flex-col items-center z-20"
                 >
                   <span className="text-5xl filter drop-shadow-[0_0_15px_rgba(250,204,21,0.7)]">🔑</span>
@@ -654,7 +708,7 @@ export function MazeGame() {
                 <motion.div
                   initial={{ scale: 0.2, opacity: 0 }}
                   animate={{ scale: [0.2, 3, 4], opacity: [0, 1, 0] }}
-                  transition={{ delay: 0.6, duration: 0.8 }}
+                  transition={{ delay: 0.2, duration: 0.8 }}
                   className="absolute w-12 h-12 bg-yellow-400 rounded-full blur-2xl"
                 />
               </div>
@@ -883,6 +937,19 @@ export function MazeGame() {
                 >
                   Aytib bo'ldim! ✨
                 </Button>
+
+                <Button 
+                  onClick={() => {
+                    // Instantly finish challenge and bypass the obstacle!
+                    finishChallenge();
+                  }}
+                  variant="outline"
+                  size="default"
+                  disabled={isMergingKeys}
+                  className="rounded-2xl h-12 px-4 border border-stone-300 text-stone-600 hover:bg-stone-100 font-bold text-xs shadow-sm transition-all"
+                >
+                  O'tkazish ⏭️
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -894,7 +961,7 @@ export function MazeGame() {
               className="text-center py-2"
             >
               <p className="text-slate-500 font-bold text-sm">
-                Yo'lni davom ettirish uchun <span className="text-green-600 font-black">Ekrandagi Yo'lga</span> teging yoki bosing 🏃‍♂️💨
+                Qahramonimiz marraga qarab ketmoqda! Uni tezlashtirish uchun <span className="text-green-600 font-black">Yo'lakka</span> bosing 🏃‍♂️💨
               </p>
             </motion.div>
           )
